@@ -3,7 +3,7 @@
 ///<reference path="HandshakeHead.ts" />
 ///<reference path="HandshakeBody.ts" />
 ///<reference path="Protocol.ts" />
-///<reference path="Utils.ts" />
+///<reference path="../Utils.ts" />
 
 class Packet {
   static keepAlive: Packet = new Packet(PacketHead.HEARTBEAT, null, null);

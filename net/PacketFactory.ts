@@ -5,7 +5,8 @@
 ///<reference path="S4Data.ts" />
 ///<reference path="Message.ts" />
 ///<reference path="HandshakeBody.ts" />
-///<reference path="node/node.d.ts" />
+///<reference path="../Utils.ts" />
+///<reference path="../node/node.d.ts" />
 
 class PacketFactory {
   private static bufferstance: PacketFactory = new PacketFactory();
@@ -15,6 +16,7 @@ class PacketFactory {
   }
 
   /**
+   * FIXME
    * TODO (Buffer's type??)
    */
   create(head: PacketHead, buffer: any): Packet {
@@ -210,7 +212,7 @@ class PacketFactory {
   private needDecompress(data: Int8Array, length: number): Int8Array {
     return new Int8Array(0);
     /*
-    var uzipResult: Int8Array = Utils.decompressData(data, length);
+    var uzipResult = Utils.decompressData(data, length);
     if (uzipResult == null || uzipResult.length != length) {
       LogUtil.e(TAG, "uzipResult Error");
       return null;
