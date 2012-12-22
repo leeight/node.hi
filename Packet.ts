@@ -8,8 +8,8 @@
 class Packet {
   static keepAlive: Packet = new Packet(PacketHead.HEARTBEAT, null, null);
   public message: Message;
-  constructor(public packetHead: PacketHead, public handshakeHead: HandshakeHead,
-              public handshakeBody: HandshakeBody) {
+  constructor(public packetHead?: PacketHead, public handshakeHead?: HandshakeHead,
+              public handshakeBody?: HandshakeBody) {
 
   }
 

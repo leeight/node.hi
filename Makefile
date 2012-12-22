@@ -5,7 +5,7 @@ DTS = $(TS:.ts=.d.ts)
 all: $(JS)
 
 %.js: %.ts
-	tsc --out out/$@ $<
+	tsc $<
 clean:
 	rm -f $(JS) $(DTS)
 

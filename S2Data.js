@@ -1,14 +1,3 @@
-var HandshakeHead = (function () {
-    function HandshakeHead() {
-        this.nReserved1 = 0;
-        this.nReserved2 = 0;
-        this.nDataLen = 0;
-    }
-    HandshakeHead.prototype.getBytes = function () {
-        return null;
-    };
-    return HandshakeHead;
-})();
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
