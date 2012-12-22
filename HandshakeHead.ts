@@ -1,4 +1,4 @@
-export class HandshakeHead {
+class HandshakeHead {
   /**
    * 保留字段，目前为0
    */
@@ -12,7 +12,7 @@ export class HandshakeHead {
    */
   nDataLen: number = 0;
 
-  getBytes(): number[] {
+  getBytes(): Int8Array {
     return null;
   }
 }

@@ -1,5 +1,5 @@
-export class HandshakeBody {
-  public keyData: number[];
+class HandshakeBody {
+  public keyData: Int8Array;
 
   getLength(): number {
     if (this.keyData != null) {

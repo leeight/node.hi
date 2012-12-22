@@ -1,11 +1,12 @@
 TS = $(shell find . -name "*.ts")
 JS = $(TS:.ts=.js)
+DTS = $(TS:.ts=.d.ts)
 
 all: $(JS)
 
 %.js: %.ts
-	tsc $<
+	tsc --out out/$@ $<
 clean:
-	rm -f $(JS)
+	rm -f $(JS) $(DTS)
 
 .PHONY: clean

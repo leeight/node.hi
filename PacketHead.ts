@@ -1,19 +1,19 @@
-import Protocol = module("./Protocol");
+///<reference path="Protocol.ts" />
 
-export class PacketHead {
-  static S1: PacketHead = new PacketHead(Protocol.ECtFlagConnectStates.CT_FLAG_CON_S1, 0, 0, 0);
-  static S2: PacketHead = new PacketHead(Protocol.ECtFlagConnectStates.CT_FLAG_CON_S2, 0, 0, 0);
-  static S3: PacketHead = new PacketHead(Protocol.ECtFlagConnectStates.CT_FLAG_CON_S3, 0, 0, 0);
-  static S4: PacketHead = new PacketHead(Protocol.ECtFlagConnectStates.CT_FLAG_CON_S4, 0, 0, 0);
+class PacketHead {
+  static S1: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S1, 0, 0, 0);
+  static S2: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S2, 0, 0, 0);
+  static S3: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S3, 0, 0, 0);
+  static S4: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S4, 0, 0, 0);
   
-  static MESSAGE: PacketHead = new PacketHead(Protocol.ECtFlagConnectStates.CT_FLAG_CON_OK, 0, 0, 0);
-  static HEARTBEAT: PacketHead = new PacketHead(Protocol.ECtFlagConnectStates.CT_FLAG_KEEPALIVE, 0, 0, 0);
+  static MESSAGE: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_OK, 0, 0, 0);
+  static HEARTBEAT: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_KEEPALIVE, 0, 0, 0);
 
   /** 协议版本，当前版本为 #BIN_PRO_VER_1_0 **/
-  private nVer: number[] = [0, 0, 1, 0];
+  private nVer: Int8Array = new Int8Array([0, 0, 1, 0]);
   
   /** 标记，参考 #CT_TAG **/
-  private nTag: string = Protocol.ProtocolConstant.CT_TAG;
+  private nTag: string = ProtocolConstant.CT_TAG;
   
   /** 是否加密,0--不加密;1--加密 **/
   public bEncrypt: number = 1;
@@ -24,7 +24,7 @@ export class PacketHead {
   /** 保留使用 **/
   public nReserved26: number = 26;
   /** 发送标志, 参考 #ECtSendFlags **/
-  public nSendFlag: number = Protocol.ECtSendFlags.CT_SEND_FLAG_LOGIN;
+  public nSendFlag: number = ECtSendFlags.CT_SEND_FLAG_LOGIN;
   /** 协议种类，暂为0 **/
   public nCategory: number = 0;
   /** 保留字段 **/
@@ -49,8 +49,8 @@ export class PacketHead {
     this.nDestDataLen = nDestDataLen;
   }
 
-  getBytes(): number[] {
-    return [];
+  getBytes(): Int8Array {
+    return new Int8Array([]);
   }
 
   createFromBytes(): PacketHead {

@@ -9,5 +9,3 @@ var HandshakeBody = (function () {
     };
     return HandshakeBody;
 })();
-exports.HandshakeBody = HandshakeBody;
-

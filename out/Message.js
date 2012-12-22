@@ -6,9 +6,9 @@ var Message = (function () {
         if(this.message == null) {
             return this.data;
         }
-        return [];
+        return new Int8Array([
+            0
+        ]);
     };
     return Message;
 })();
-exports.Message = Message;
-

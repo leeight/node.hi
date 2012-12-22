@@ -9,5 +9,3 @@ var HandshakeHead = (function () {
     };
     return HandshakeHead;
 })();
-exports.HandshakeHead = HandshakeHead;
-

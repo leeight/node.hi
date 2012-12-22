@@ -1,5 +1,17 @@
-var ECtFlagConnectStates = (function () {
-    function ECtFlagConnectStates() { }
+var HandshakeHead = (function () {
+    function HandshakeHead() {
+        this.nReserved1 = 0;
+        this.nReserved2 = 0;
+        this.nDataLen = 0;
+    }
+    HandshakeHead.prototype.getBytes = function () {
+        return null;
+    };
+    return HandshakeHead;
+})();
+var ECtFlagConnectStates;
+(function (ECtFlagConnectStates) {
+    ECtFlagConnectStates._map = [];
     ECtFlagConnectStates.CT_FLAG_CON_S1 = 0;
     ECtFlagConnectStates.CT_FLAG_CON_S2 = 1;
     ECtFlagConnectStates.CT_FLAG_CON_S3 = 2;
@@ -9,17 +21,16 @@ var ECtFlagConnectStates = (function () {
     ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_NOAES = 7;
     ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES = 15;
     ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES = 23;
-    return ECtFlagConnectStates;
-})();
-exports.ECtFlagConnectStates = ECtFlagConnectStates;
-var ECtSendFlags = (function () {
-    function ECtSendFlags() { }
+})(ECtFlagConnectStates || (ECtFlagConnectStates = {}));
+
+var ECtSendFlags;
+(function (ECtSendFlags) {
+    ECtSendFlags._map = [];
     ECtSendFlags.CT_SEND_FLAG_HANDSHAKE = 0;
     ECtSendFlags.CT_SEND_FLAG_LOGIN = 1;
     ECtSendFlags.CT_SEND_FLAG_LOGOUT = 2;
-    return ECtSendFlags;
-})();
-exports.ECtSendFlags = ECtSendFlags;
+})(ECtSendFlags || (ECtSendFlags = {}));
+
 var ProtocolConstant = (function () {
     function ProtocolConstant() { }
     ProtocolConstant.MAX_METHOD = 4;
@@ -32,19 +43,18 @@ var ProtocolConstant = (function () {
     ProtocolConstant.ZIP_METHOD_COMPRESS = 1;
     ProtocolConstant.CON_METHOD_NULL = 0;
     ProtocolConstant.CON_METHOD_NONE = 1;
-    ProtocolConstant.CON_METHOD_A = [
+    ProtocolConstant.CON_METHOD_A = new Int8Array([
         2, 
         0, 
         0, 
         0
-    ];
+    ]);
     ProtocolConstant.CT_TAG = 'IMV1';
     ProtocolConstant.BIN_PRO_VER_1_0 = 1;
     ProtocolConstant.PAKECT_HEAD_LENGTH = 40;
     return ProtocolConstant;
 })();
-exports.ProtocolConstant = ProtocolConstant;
-exports.IM_RootPubKeyData = [
+var IM_RootPubKeyData = [
     [
         48, 
         -127, 
@@ -1182,4 +1192,21 @@ exports.IM_RootPubKeyData = [
         1
     ]
 ];
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+}
+var S1Data = (function (_super) {
+    __extends(S1Data, _super);
+    function S1Data() {
+        _super.apply(this, arguments);
 
+        this.nEPVer = 1;
+        this.nConMethod = ProtocolConstant.CON_METHOD_A;
+    }
+    S1Data.prototype.getBytes = function () {
+        return new Int8Array(0);
+    };
+    return S1Data;
+})(HandshakeHead);

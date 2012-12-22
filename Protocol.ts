@@ -15,45 +15,46 @@
  *  
  **/
 
-export class ECtFlagConnectStates {
-    public static CT_FLAG_CON_S1: number = 0;                 // 会话第一步(握手)
-    public static CT_FLAG_CON_S2: number = 1;                 // 会话第二部(握手)
-    public static CT_FLAG_CON_S3: number = 2;                 // 会话第三部(握手)
-    public static CT_FLAG_CON_S4: number = 3;                 // 会话第四步(握手)
-    public static CT_FLAG_KEEPALIVE: number = 37;             // 心跳包
-    public static CT_FLAG_CON_OK: number = 31;                // 会话进入正常流程
-    public static CT_FLAG_CON_OK_NOZIP_NOAES: number = 7;     // 正常会话-不压缩-不加密
-    public static CT_FLAG_CON_OK_NOZIP_DOAES: number = 15;    // 正常会话-不压缩-要加密
-    public static CT_FLAG_CON_OK_DOZIP_NOAES: number = 23;    // 正常会话-要压缩-要加密
+enum ECtFlagConnectStates {
+    CT_FLAG_CON_S1 = 0,                 // 会话第一步(握手)
+    CT_FLAG_CON_S2 = 1,                 // 会话第二部(握手)
+    CT_FLAG_CON_S3 = 2,                 // 会话第三部(握手)
+    CT_FLAG_CON_S4 = 3,                 // 会话第四步(握手)
+    CT_FLAG_KEEPALIVE = 37,             // 心跳包
+    CT_FLAG_CON_OK = 31,                // 会话进入正常流程
+    CT_FLAG_CON_OK_NOZIP_NOAES = 7,     // 正常会话-不压缩-不加密
+    CT_FLAG_CON_OK_NOZIP_DOAES = 15,    // 正常会话-不压缩-要加密
+    CT_FLAG_CON_OK_DOZIP_NOAES = 23,    // 正常会话-要压缩-要加密
 }
 
-export class ECtSendFlags {
-    public static CT_SEND_FLAG_HANDSHAKE: number = 0;
-    public static CT_SEND_FLAG_LOGIN: number = 1;
-    public static CT_SEND_FLAG_LOGOUT: number = 2;
+enum ECtSendFlags {
+    CT_SEND_FLAG_HANDSHAKE = 0,
+    CT_SEND_FLAG_LOGIN = 1,
+    CT_SEND_FLAG_LOGOUT = 2,
 }
 
-export class ProtocolConstant {
-    public static MAX_METHOD: number = 4;
-    public static SYM_METHOD_NONE: number = 0;                // 无加密
-    public static SYM_METHOD_AES: number = 1;                 // AES加密策略
-    public static SYM_METHOD_DES: number = 2;                 // DES加密策略
-    public static UNSYM_METHOD_NONE: number = 0;              // 无加密
-    public static UNSYM_METHOD_RSA: number = 1;               // RSA加密策略
-    public static ZIP_METHOD_NONE: number = 0;                // 无压缩
-    public static ZIP_METHOD_COMPRESS: number = 1;            // zlib compress压缩
-    public static CON_METHOD_NULL: number = 0;                // 非法数据
-    public static CON_METHOD_NONE: number = 1;                // 无压缩, 无加密
-    public static CON_METHOD_A: number[] = [2, 0, 0, 0];      // RSA交换密钥, AES加密 ZIP(compress)压缩
-    public static CT_TAG: string = 'IMV1';                    // ??
-    public static BIN_PRO_VER_1_0: number = 1;                // 1.0
-    public static PAKECT_HEAD_LENGTH: number = 40;            // pack_head (OnePacket) 长度
+class ProtocolConstant {
+    public static MAX_METHOD = 4;
+    public static SYM_METHOD_NONE = 0;                // 无加密
+    public static SYM_METHOD_AES = 1;                 // AES加密策略
+    public static SYM_METHOD_DES = 2;                 // DES加密策略
+    public static UNSYM_METHOD_NONE = 0;              // 无加密
+    public static UNSYM_METHOD_RSA = 1;               // RSA加密策略
+    public static ZIP_METHOD_NONE = 0;                // 无压缩
+    public static ZIP_METHOD_COMPRESS = 1;            // zlib compress压缩
+    public static CON_METHOD_NULL = 0;                // 非法数据
+    public static CON_METHOD_NONE = 1;                // 无压缩, 无加密
+    // RSA交换密钥, AES加密 ZIP(compress)压缩
+    public static CON_METHOD_A = new Int8Array([2, 0, 0, 0]);
+    public static CT_TAG = 'IMV1';                    // ??
+    public static BIN_PRO_VER_1_0 = 1;                // 1.0
+    public static PAKECT_HEAD_LENGTH = 40;            // pack_head (OnePacket) 长度
 }
 
 /**
  * 预置的8对公钥
  */
-export var IM_RootPubKeyData:number[][] = [
+var IM_RootPubKeyData = [
     [
      48, -127, -119, 2, -127, -127, 0, -23, 98, 119, -58, -105, 120, 88, -64, 40,
      -29, -127, -54, -107, -43, -72, 19, 69, 81, -44, -117, 106, -60, -46, 42, -29,

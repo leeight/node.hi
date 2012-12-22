@@ -6,15 +6,15 @@
 ///<reference path="Utils.ts" />
 
 class Packet {
-  static keepAlive: Packet = new Packet(Packet.HEARTBEAT, null, null);
+  static keepAlive: Packet = new Packet(PacketHead.HEARTBEAT, null, null);
   public message: Message;
   constructor(public packetHead: PacketHead, public handshakeHead: HandshakeHead,
               public handshakeBody: HandshakeBody) {
 
   }
 
-  getBytes(): number[] {
-    var result: number[] = null;
+  getBytes(): Int8Array {
+    var result: Int8Array = null;
     var ctFlag: number = this.packetHead.ctFlag;
 
     switch (ctFlag) {
