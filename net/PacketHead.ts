@@ -1,6 +1,9 @@
 ///<reference path="Protocol.ts" />
+///<reference path="../node/node.d.ts" />
 
-class PacketHead {
+module net {
+
+export class PacketHead {
   static S1: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S1, 0, 0, 0);
   static S2: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S2, 0, 0, 0);
   static S3: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_CON_S3, 0, 0, 0);
@@ -10,7 +13,7 @@ class PacketHead {
   static HEARTBEAT: PacketHead = new PacketHead(ECtFlagConnectStates.CT_FLAG_KEEPALIVE, 0, 0, 0);
 
   /** 协议版本，当前版本为 #BIN_PRO_VER_1_0 **/
-  private nVer: Int8Array = new Int8Array([0, 0, 1, 0]);
+  private nVer: Buffer = new Buffer([0, 0, 1, 0]);
   
   /** 标记，参考 #CT_TAG **/
   private nTag: string = ProtocolConstant.CT_TAG;
@@ -49,11 +52,13 @@ class PacketHead {
     this.nDestDataLen = nDestDataLen;
   }
 
-  getBytes(): Int8Array {
-    return new Int8Array([]);
+  getBytes(): Buffer {
+    return new Buffer([]);
   }
 
   createFromBytes(): PacketHead {
     return new PacketHead(0, 0, 0, 0);
   }
+}
+
 }

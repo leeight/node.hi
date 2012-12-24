@@ -1,15 +1,15 @@
+///<reference path="../node/node.d.ts" />
+
 class Message {
   message: string;
 
-  constructor(public data?: Int8Array) {
+  constructor(public data?: Buffer) {
   }
 
-  getBytes(): Int8Array {
+  getBytes(): Buffer {
     if (this.message == null) {
       return this.data;
     }
-    // FIXME
-    return new Int8Array(0);
-    // return this.message.getBytes();
+    return new Buffer(this.message);
   }
 }

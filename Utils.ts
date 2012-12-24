@@ -1,5 +1,7 @@
-class Utils {
-  static sumArray(a: Int8Array, b: Int8Array): Int8Array {
-    return new Int8Array([]);
+///<reference path="node/node.d.ts" />
+
+export class Utils {
+  static sumArray(a: Buffer, b: Buffer): Buffer {
+    return new Buffer([]);
   }
 }

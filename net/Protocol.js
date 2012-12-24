@@ -11,7 +11,6 @@ var ECtFlagConnectStates;
     ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES = 15;
     ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES = 23;
 })(ECtFlagConnectStates || (ECtFlagConnectStates = {}));
-
 var ECtSendFlags;
 (function (ECtSendFlags) {
     ECtSendFlags._map = [];
@@ -19,7 +18,6 @@ var ECtSendFlags;
     ECtSendFlags.CT_SEND_FLAG_LOGIN = 1;
     ECtSendFlags.CT_SEND_FLAG_LOGOUT = 2;
 })(ECtSendFlags || (ECtSendFlags = {}));
-
 var ProtocolConstant = (function () {
     function ProtocolConstant() { }
     ProtocolConstant.MAX_METHOD = 4;

@@ -4,8 +4,11 @@
 ///<reference path="HandshakeBody.ts" />
 ///<reference path="Protocol.ts" />
 ///<reference path="../Utils.ts" />
+///<reference path="../node/node.d.ts" />
 
-class Packet {
+module net {
+
+export class Packet {
   static keepAlive: Packet = new Packet(PacketHead.HEARTBEAT, null, null);
   public message: Message;
   constructor(public packetHead?: PacketHead, public handshakeHead?: HandshakeHead,
@@ -13,8 +16,8 @@ class Packet {
 
   }
 
-  getBytes(): Int8Array {
-    var result: Int8Array = null;
+  getBytes(): Buffer {
+    var result: Buffer = null;
     var ctFlag: number = this.packetHead.ctFlag;
 
     switch (ctFlag) {
@@ -47,4 +50,6 @@ class Packet {
 
     return result;
   }
+}
+
 }

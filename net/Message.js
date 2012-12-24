@@ -6,7 +6,7 @@ var Message = (function () {
         if(this.message == null) {
             return this.data;
         }
-        return new Int8Array(0);
+        return new Buffer(this.message);
     };
     return Message;
 })();
