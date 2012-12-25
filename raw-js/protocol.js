@@ -161,6 +161,87 @@ S2Data.createFromBytes = function(bytes) {
   return packet;
 }
 
+function S3Data() {
+  HandshakeHead.call(this);
+}
+base.inherits(S3Data, HandshakeHead);
+
+/**
+ * @return {Buffer}
+ */
+S3Data.prototype.getBytes = function() {
+  // 4: nReserved1
+  // 4: nReserved2
+  // 4: nDataLen
+
+  var bytes = new Buffer(12);
+  bytes.writeInt32LE(this.nReserved1, 0);
+  bytes.writeInt32LE(this.nReserved2, 4);
+  bytes.writeInt32LE(this.nDataLen, 8);
+
+  return bytes;
+}
+
+/**
+ * @param {Buffer} bytes
+ * @return {S4Data}
+ */
+S3Data.createFromBytes = function(bytes) {
+  var packet = new S3Data();
+  packet.nReserved1 = bytes.readInt32LE(0);
+  packet.nReserved2 = bytes.readInt32LE(4);
+  packet.nDataLen = bytes.readInt32LE(8);
+
+  return packet;
+}
+
+function S4Data() {
+  HandshakeHead.call(this);
+
+  /**
+   * @type {byte[16]}
+   */
+  this.seed;
+
+  /**
+   * @type {int}
+   */
+  this.nKeepAliveSpace;
+}
+base.inherits(S4Data, HandshakeHead);
+
+/**
+ * @return {Buffer}
+ */
+S4Data.prototype.getBytes = function() {
+  // 4: nKeepAliveSpace
+  // 4: nReserved1
+  // 4: nReserved2
+  // 4: nDataLen
+  var bytes = new Buffer(16);
+  bytes.writeInt32LE(this.nKeepAliveSpace, 0);
+  bytes.writeInt32LE(this.nReserved1, 4);
+  bytes.writeInt32LE(this.nReserved2, 8);
+  bytes.writeInt32LE(this.nDataLen, 12);
+
+  return bytes;
+}
+
+/**
+ * @param {Buffer} bytes
+ * @return {S4Data}
+ */
+S4Data.createFromBytes = function(bytes) {
+  var packet = new S4Data();
+  packet.seed = new Buffer(bytes.slice(0, 16));
+  packet.nKeepAliveSpace = bytes.readInt32LE(16);
+  packet.nReserved1 = bytes.readInt32LE(20);
+  packet.nReserved2 = bytes.readInt32LE(24);
+  packet.nDataLen = bytes.readInt32LE(28);
+
+  return packet;
+}
+
 /**
  * @type {int} ctFlag
  * @type {int} nSrcDataLen
@@ -426,6 +507,8 @@ exports.HandshakeHead = HandshakeHead;
 exports.HandshakeBody = HandshakeBody;
 exports.S1Data = S1Data;
 exports.S2Data = S2Data;
+exports.S3Data = S3Data;
+exports.S4Data = S4Data;
 exports.PacketHead = PacketHead;
 exports.Message = Message;
 exports.Packet = Packet;

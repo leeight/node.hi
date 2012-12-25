@@ -18,6 +18,7 @@ var net = require('net')
 var protocol = require('./protocol');
 var constant = require('./constant');
 var security = require('./security');
+var utils = require('./utils');
 
 /*
 var asn1 = require('./asn1');
@@ -49,7 +50,23 @@ process.exit(0);
 /**
  * 是否出于握手阶段
  */
-var isHandshake = false;
+var IS_HAND_SHAKE = false;
+
+/**
+ * 是否握手成功
+ */
+var IS_HAND_SHAKE_OK = false;
+
+/**
+ * S2阶段获取到的HAND_SHAKE_KEY
+ */
+var HAND_SHAKE_KEY = null;
+
+/**
+ * Client生成的公钥
+ */
+var S3_PUBKEY_BYTE = null;
+
 function sendHandshakeS1(socket) {
   var handshakeHeadS1 = new protocol.S1Data();
   var s1DataByte = handshakeHeadS1.getBytes();
@@ -65,7 +82,34 @@ function sendHandshakeS1(socket) {
   socket.write(bytes);
 }
 
-function sendHandshakeS3(socket, handshakeKey) {
+function sendHandshakeS3(socket) {
+  var pair = security.getKeyPair();
+
+  S3_PUBKEY_BYTE = pair[0];
+  S3_PRIKEY_BYTE = pair[1];
+
+  // 默认的RSA_PKCS1_OAEP_PADDING是有问题的, 需要使用RSA_PKCS1_PADDING
+  var k1 = HAND_SHAKE_KEY.encrypt(new Buffer(S3_PUBKEY_BYTE.slice(0, 100)), undefined, undefined, 1);
+  var k2 = HAND_SHAKE_KEY.encrypt(new Buffer(S3_PUBKEY_BYTE.slice(100, 140)), undefined, undefined, 1);
+
+  var key = utils.sumArray(k1, k2);
+  var handshakeBodyS3 = new protocol.HandshakeBody();
+  handshakeBodyS3.keyData = key;
+
+  var handshakeHeadS3 = new protocol.S3Data();
+  handshakeHeadS3.nDataLen = handshakeBodyS3.keyData.length;
+  handshakeHeadS3.nReserved1 = 0;
+  handshakeHeadS3.nReserved2 = 0;
+
+  var packetHeadS3 = protocol.PacketHead.S3;
+  var s3DataByte = handshakeHeadS3.getBytes();
+  packetHeadS3.nSendFlag = constant.ECtSendFlags.CT_SEND_FLAG_HANDSHAKE;
+  packetHeadS3.nDestDataLen = s3DataByte.length + handshakeBodyS3.getLength();
+  packetHeadS3.nSrcDataLen = s3DataByte.length + handshakeBodyS3.getLength();
+  packetHeadS3.nZipDataLen = s3DataByte.length + handshakeBodyS3.getLength();
+
+  var handshakeS3 = new protocol.Packet(packetHeadS3, handshakeHeadS3, handshakeBodyS3);
+  socket.write(handshakeS3.getBytes());
 }
 
 var socket = net.createConnection(1863, "m3.im.baidu.com");
@@ -88,7 +132,7 @@ socket.on('data', function (d) {
         length = head.nSrcDataLen;
         break;
     }
-    console.log(head);
+    // console.log(head);
 
     var packet = protocol.PacketFactory.getInstance().create(head,
         d.slice(constant.ProtocolConstant.PAKECT_HEAD_LENGTH));
@@ -99,14 +143,15 @@ socket.on('data', function (d) {
         var s2 = packet.handshakeHead;
         var keyNo = s2.nRootKeyNO;
         var byteKey = constant.IM_RootPubKeyData_PEM[keyNo];
-        console.log(packet.handshakeBody.keyData.length);
-        var handshakeKey = security.decodeDataToKey(packet.handshakeBody.keyData,
+        // console.log(packet.handshakeBody.keyData.length);
+        HAND_SHAKE_KEY = security.decodeDataToKey(packet.handshakeBody.keyData,
           security.publicKey(byteKey));
-        console.log(handshakeKey);
-        // sendHandshakeS3(this, handshakeKey);
+        // console.log(HAND_SHAKE_KEY);
+        sendHandshakeS3(this);
         break;
       }
       case constant.ECtFlagConnectStates.CT_FLAG_CON_S4: {
+        console.log('Received HandshakeS4');
         break;
       }
       case constant.ECtFlagConnectStates.CT_FLAG_KEEPALIVE: {

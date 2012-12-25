@@ -24,6 +24,31 @@ var PUBKEY_PREFIX = new Buffer([
   0x05,0x00,0x03,0x81,0x8D,0x00
 ]);
 
+function format(msg) {
+  return msg.replace(/^----.*/gm, '').replace(/\r?\n/g, '');
+}
+/**
+ * 长度为2的Buffer数组.
+ * @return {Array.<Buffer>}
+ */
+exports.getKeyPair = function() {
+  var pair = ursa.generatePrivateKey(1024);
+
+  // pubkey和prikey本身已经是PEM格式了, 注意去掉换行之类的东东
+
+  // XXX pubkey是有前缀的, 为了保证140个字节, 需要去掉前缀
+  var pubkey = format(pair.toPublicPem().toString('ascii'));
+
+  // 让Buffer自动解码
+  var k1 = new Buffer(pubkey, 'base64').slice(PUBKEY_PREFIX.length);
+
+  // XXX prikey是没有前缀的, 自己用, 不需要搞那么复杂.
+  var prikey = format(pair.toPrivatePem().toString('ascii'));
+  var k2 = new Buffer(prikey, 'base64');
+
+  return [k1, k2];
+}
+
 /**
  * @param {Buffer} keyData
  * @param {ursa.PublicKey} key
@@ -76,6 +101,13 @@ exports.publicKey = function(pem) {
   return ursa.createPublicKey(pem);
 }
 
+/**
+ * 按照我的理解, 应该就是把PUBKEY_PREFIX的前缀去掉即可.
+ * @param {Buffer} bytes
+ */
+exports.getASN1PublicKey = function(bytes) {
+  return new Buffer(bytes.slice(PUBKEY_PREFIX.length));
+}
 
 
 
