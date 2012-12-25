@@ -50,6 +50,67 @@ exports.ProtocolConstant = {
 }
 
 /**
+ * 预置的8对公钥(PEM)格式
+ */
+exports.IM_RootPubKeyData_PEM = [
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDpYnfGl3hYwCjjgcqV1bgTRVHU',
+'i2rE0irjYRCs5TqlqUiuPxUDTNakWAePuVMd+/GFuLWU9U5Zeve0vHEpJ/zaNTWL',
+'Qn52a6eiDkZ+W5bwv6AKgpTP4DNBeIGg9gqG/Bfr7uP0mKc0Sm/eq3JmQqPe8XKQ',
+'55D8mKoJXXfloh/PqQIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDW1gk7A72b5Hdn1HrODaSlORRB',
+'y2dJYOfTjmSOEKgdRLJWcpS5t3fAIn+jjKrWPUXDIEmF+4ajWExXWgnYHBrb13xP',
+'Iyv9tehjglBAScfvS2XW0XNMsJt8zQwiiMHyE1mXHvj17bRvGDJFAPlttC+p+MQt',
+'SVa14Mh/vAKJ4RXkKQIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHuWO3qMVDTtbRrLbF7JGT0Q5/',
+'bhNEkUZ0ttOAaORshIciXNoFLnHv2xiXTV1UFjXy+MD9a3ztxhk9hgRQ7BB/9qwe',
+'hAma8p/Rovr2whVTcbBNVnFyx5BZ/OvW/fvnxhckeBcnDWyb5PtxMn2mJKSt8U5Y',
+'vbHfMbta1UwDT0mJOwIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCpFvPpt7CcYBFMk68t4akM4IXH',
+'cHzIIdZDxwmfYczTeKoF6lQ9vpcApQKaTGMucVg7moE/IoxKfcwD2v0nYHIImqJf',
+'//+ExCc1uuvGsV+V8ineuZxtp3o/4kP9xC98FfwQRUyaki/HoHGAZecwMgC+o73H',
+'hOzrzczhmnjGrsukLQIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3KUecJvpIM1mzQNivuM+0hGdG',
+'BAIaJXCSmnh8q42ZEcj9HNDiRttXxhsA7G1zrpPf7PCe25l75wt7FGBvb63tltQQ',
+'4yOBmfNxUZiqxe71XT5Fs1BVGLBqK9UcsJodt2ULFOM932t4IsJzeWUL5weJveHo',
+'r4zFoExR8i5Da0rmcQIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDUL9Kcm35vnLyTWCUB9FHH/QIo',
+'K5R+pLScx3hXzeRDTM2FWvgs0jFtAF4g6baMQn+hyymo/eLoqPo8CSTw6UOt9hnv',
+'wnTFwHQm8AN2Yyh8axRv+QcOTmYxct0NfTnPgIAAzyr5yRQG+rZjSSsEDVlnKHlg',
+'lu9cROW7DVdIFptETQIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6Ld8xogBWJ5Nf4JHKV87lMzNN',
+'7l8sLKb4FcarVj8oX1LR24MqY2pv99m8rcEqjEArGoAMDZCD25B3VqowL/k0T2QA',
+'CbgeHiB3aCoQIBgXb4jY8zoYJco8P3SdHwQtZ5nIvoi14+TO5k2FVsn/JxefLqXE',
+'6Ct0XLqCcMaTyc33BwIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n'),
+
+['-----BEGIN PUBLIC KEY-----',
+'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3jhqrwbxAtE2tmWJvffBV8Tym',
+'TYf5Kw4xWFR+ok+qDsyYEz6P670wvUblLIJqYIuXbUIv9WYl46exZeKrBJMeH1S9',
+'1vQyvo4J2ptr8ORra6RAq0I1dNtlJCUbuAFmo1hPdR/2+FfVlOxSNeU/o/kOY5sX',
+'gFkk0CkVucaK3kTdZQIDAQAB',
+'-----END PUBLIC KEY-----'].join('\n')
+];
+
+/**
  * 预置的8对公钥
  */
 exports.IM_RootPubKeyData = [
