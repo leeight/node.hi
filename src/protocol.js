@@ -17,6 +17,8 @@
 var constant = require('./constant');
 var base = require('./base');
 var utils = require('./utils');
+var security = require('./security');
+var logger = require('./logger').logger;
 var ECtFlagConnectStates = constant.ECtFlagConnectStates;
 var ProtocolConstant = constant.ProtocolConstant;
 var ECtSendFlags = constant.ECtSendFlags;
@@ -387,7 +389,7 @@ function Message(opt_data) {
 }
 Message.prototype.getBytes = function() {
   if (this.message) {
-    return new Buffer(this.message);
+    return new Buffer(this.message, 'utf-8');
   }
   return this.data;
 }
@@ -415,7 +417,7 @@ Packet.keepAlive = new Packet(PacketHead.HEARTBEAT, null, null);
 Packet.prototype.getBytes = function() {
   var result;
   var ctFlag = this.packetHead.ctFlag;
-  console.log(ctFlag);
+  logger.debug('ctFlag = [' + ctFlag + ']');
   switch (ctFlag) {
     case ECtFlagConnectStates.CT_FLAG_CON_S1:
       result = utils.sumArray(this.packetHead.getBytes(),
@@ -452,6 +454,28 @@ function PacketFactory() {
 base.addSingletonGetter(PacketFactory);
 
 /**
+ * @param {Buffer} encryptedData 加密的数据.
+ * @param {int} length 解密之后的长度.
+ */
+PacketFactory.prototype.decrypt = function(encryptedData, length) {
+  return security.AESDecrypt(encryptedData, length);
+}
+
+/**
+ * @param {Buffer} zipedData 压缩之后的数据.
+ * @param {int} length 解压缩之后的长度.
+ */
+PacketFactory.prototype.decompress = function(zipedData, length) {
+  var zlib = require('zlib');
+  var original = zlib.inflate(zipedData);
+  if (original.length != length) {
+    // FIXME 如何处理呢?
+    return null;
+  }
+  return original;
+}
+
+/**
  * @type {PacketHead} head
  * @type {Buffer} bytes
  */
@@ -462,7 +486,7 @@ PacketFactory.prototype.create = function(head, bytes) {
     case ECtFlagConnectStates.CT_FLAG_CON_S2: {
       // Modifying the new buffer slice will modify memory in the original buffer!
       var s2Data = S2Data.createFromBytes(bytes.slice(0, 18));
-      console.log(s2Data);
+      logger.debug(s2Data);
 
       var hb = new HandshakeBody();
       hb.keyData = bytes.slice(18, 18 + s2Data.nDataLen);
@@ -498,6 +522,23 @@ PacketFactory.prototype.create = function(head, bytes) {
     }
 
     case ECtFlagConnectStates.CT_FLAG_CON_OK: {
+      logger.debug('get message CT_FLAG_CON_OK');
+
+      var dataOK = bytes.slice(0, head.nDestDataLen);
+      var decryptedData = this.decrypt(dataOK, head.nZipDataLen);
+      if (!decryptedData) {
+        logger.error('invalid CT_FLAG_CON_OK packet, decrypt failed!');
+        break;
+      }
+
+      var decompressData = this.decompress(decryptedData, head.nSrcDataLen);
+      if (!decompressData) {
+        logger.error('invalid CT_FLAG_CON_OK packet, decompress failed!');
+      }
+
+      packet = new Packet();
+      packet.packetHead = head;
+      packet.message = new Message(decompressData);
       break;
     }
 
@@ -514,7 +555,8 @@ PacketFactory.prototype.create = function(head, bytes) {
     }
 
     default:
-      console.error('Invalid ctFlag = [' + head.ctFlag + ']');
+      logger.error(head);
+      logger.error('Invalid ctFlag = [' + head.ctFlag + ']');
       break;
   }
 

@@ -16,6 +16,7 @@
  **/
 
 var ursa = require('ursa');
+var crypto = require('crypto');
 var utils = require('./utils');
 
 var PUBKEY_PREFIX = new Buffer([
@@ -109,6 +110,66 @@ exports.getASN1PublicKey = function(bytes) {
   return new Buffer(bytes.slice(PUBKEY_PREFIX.length));
 }
 
+/**
+ * @type {Buffer}
+ */
+var MD5_SEED = null;
+
+/**
+ * @param {Buffer} md5_seed
+ */
+exports.setMd5Seed = function(md5_seed) {
+  MD5_SEED = new Buffer(md5_seed);
+}
+
+var AES_KEY = null;
+
+/**
+ * @param {Buffer} aes_key
+ */
+exports.setAesKey = function(aes_key) {
+  AES_KEY = new Buffer(aes_key);
+}
+
+
+/**
+ * @param {Buffer} encryptedData 加密的数据.
+ * @param {int} length 解密之后的长度.
+ */
+exports.AESDecrypt = function(encryptedData, length) {
+  var msg = [];
+
+  var decipher = crypto.createDecipher("aes128", argv.password);
+  msg.push(decipher.update(encryptedData, 'binary', 'binary'));
+  msg.push(decipher.final('binary'));
+
+  // TODO 校验长度是否正确
+
+  return new Buffer(msg);
+}
+
+/**
+ * @param {string} password
+ * @return {string}
+ */
+exports.encryptPassword = function(password) {
+  if (!MD5_SEED) {
+    // 没有握手成功?
+    return '';
+  }
+
+  var md5sum = crypto.createHash('md5');
+  md5sum.update(password, 'utf-8');
+
+  var z = md5sum.digest('hex');
+  var first = new Buffer(z);
+  var second = utils.sumArray(first, MD5_SEED);
+
+  md5sum = crypto.createHash('md5');
+  md5sum.update(second);
+
+  return md5sum.digest('hex');
+}
 
 
 

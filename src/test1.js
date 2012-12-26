@@ -81,6 +81,10 @@ var zzz = ursa.generatePrivateKey(1024);
 console.log(zzz.encrypt(new Buffer(100), undefined, undefined, 1).length);
 console.log(zzz.encrypt(new Buffer(40) , undefined, undefined, 1).length);
 
+security.setMd5Seed(new Buffer([1,2,3]));
+console.log(security.encryptPassword("leeight"));
+console.log(security.encryptPassword("你好"));
+
 
 
 

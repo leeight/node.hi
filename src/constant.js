@@ -49,6 +49,21 @@ exports.ProtocolConstant = {
     PAKECT_HEAD_LENGTH : 40             // pack_head (OnePacket) 长度
 }
 
+exports.VerifyCodeType = {
+  VerifyCodeUnknown : 0,
+  VerifyCodeLogin : 1,                  // 登录验证码，需要携带lid
+  VerifyCodeAddFriend : 2,              // 添加好友，需要携带friend
+  VerifyCodeDeleteFriend : 3,           // 删除好友
+  VerifyCodeTransferGroup : 4,          // 转让群
+  VerifyCodeCreateGroup : 5,            // 创建群
+  VerifyCodeSendBaiduMsg : 6,           // 发送站内消息
+  VerifyCodeDisbandGroup : 7,           // 解散群，服务器统计以判断用户是否可以解散群，客户端不判断是否需要出验证码
+  VerifyCodeJoinGroup : 8,              // 加入群
+  VerifyCodeQuitGroup : 9,              // 退出群
+  VerifyCodeSendEmail : 10,             // 发送 email
+  VerifyCodeTmpSession : 11             // 发送临时会话消息，需要携带uid2
+}
+
 /**
  * 预置的8对公钥(PEM)格式
  */
