@@ -46,7 +46,7 @@ exports.getKeyPair = function() {
   var prikey = format(pair.toPrivatePem().toString('ascii'));
   var k2 = new Buffer(prikey, 'base64');
 
-  return [k1, k2];
+  return [k1, k2, pair];
 }
 
 /**

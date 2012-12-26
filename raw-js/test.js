@@ -67,6 +67,20 @@ var HAND_SHAKE_KEY = null;
  */
 var S3_PUBKEY_BYTE = null;
 
+var S3_PRIKEY_BYTE = null;
+
+var S3_KEYPAIR = null;
+
+/**
+ * S4阶段获取到的MD5_SEED
+ */
+var MD5_SEED = null;
+
+/**
+ * S4阶段获取到的对称加密密钥
+ */
+var AES_KEY = null;
+
 function sendHandshakeS1(socket) {
   var handshakeHeadS1 = new protocol.S1Data();
   var s1DataByte = handshakeHeadS1.getBytes();
@@ -87,6 +101,7 @@ function sendHandshakeS3(socket) {
 
   S3_PUBKEY_BYTE = pair[0];
   S3_PRIKEY_BYTE = pair[1];
+  S3_KEYPAIR = pair[2];
 
   // 默认的RSA_PKCS1_OAEP_PADDING是有问题的, 需要使用RSA_PKCS1_PADDING
   var k1 = HAND_SHAKE_KEY.encrypt(new Buffer(S3_PUBKEY_BYTE.slice(0, 100)), undefined, undefined, 1);
@@ -152,6 +167,14 @@ socket.on('data', function (d) {
       }
       case constant.ECtFlagConnectStates.CT_FLAG_CON_S4: {
         console.log('Received HandshakeS4');
+        var s4 = packet.handshakeHead;
+        MD5_SEED = s4.seed;
+
+        var s4body = packet.handshakeBody;
+        var encryptedAESKey = s4body.keyData;
+        AES_KEY = S3_KEYPAIR.decrypt(encryptedAESKey, undefined, undefined, 1);
+        console.log('AES_KEY');
+        console.log(AES_KEY);
         break;
       }
       case constant.ECtFlagConnectStates.CT_FLAG_KEEPALIVE: {
