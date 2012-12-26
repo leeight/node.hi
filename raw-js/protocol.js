@@ -472,6 +472,24 @@ PacketFactory.prototype.create = function(head, bytes) {
     }
 
     case ECtFlagConnectStates.CT_FLAG_CON_S4: {
+      var s4Data = S4Data.createFromBytes(bytes.slice(0, 32));
+
+      var hbs4 = new HandshakeBody();
+      hbs4.keyData = bytes.slice(32, 32 + s4Data.nDataLen);
+
+      var packet = new Packet(head, s4Data, hbs4);
+
+      var xmlLength = head.nSrcDataLen - 32 - s4Data.nDataLen;
+      var start = 32 + s4Data.nDataLen;
+      var end = start + xmlLength;
+      var xml = bytes.slice(start, end);
+
+      packet.message = new Message();
+      packet.message.message = xml.toString('ascii');
+
+      // <ts_config><heartbeat sign_interval="300" echo_timeout="600"/></ts_config>
+      // 历史性的一刻, 终于收到一条能看懂的消息了.
+
       break;
     }
 
