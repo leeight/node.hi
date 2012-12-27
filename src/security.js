@@ -146,6 +146,10 @@ exports.AESDecrypt = function(encryptedData, length) {
   last.copy(buffer, first.length, 0, last.length);
 
   // FIXME(leeight) 校验长度是否正确
+  if (buffer.length != length) {
+    throw new Error('AESDecrypt failed, dst length = [' + length +
+      '], buffer length = [' + buffer.length + ']');
+  }
 
   return buffer;
 }

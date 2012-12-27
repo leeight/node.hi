@@ -54,7 +54,7 @@ function login() {
   logger.debug('login command seq = [' + seq + ']');
 }
 
-var socket = net.createConnection(1863, "m3.im.baidu.com");
+var socket = net.createConnection(1863, "m1.im.baidu.com");
 socket.on('connect', function (connect) {
   logger.debug('connection established');
   NET_MANAGER = new lnet.NetManager(this);

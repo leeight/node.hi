@@ -61,6 +61,7 @@ NetManager.getNextId = function() {
 
 NetManager.prototype.onData = function(bytes) {
   logger.debug('receiving data');
+  logger.debug(bytes);
 
   var packet = this.decode(bytes);
 
@@ -177,7 +178,7 @@ NetManager.prototype.removeCommand = function(seq) {
  * @param {Packet} packet
  */
 NetManager.prototype.send = function(packet) {
-  // BaiduHiEncoder.java
+  logger.debug('NetManager.prototype.send');
   if (this.IS_HAND_SHAKE) {
     this.socket.write(packet.getBytes());
   } else {
@@ -193,9 +194,9 @@ NetManager.prototype.send = function(packet) {
         head.nSrcDataLen = msgBytes.length;
         head.nZipDataLen = zipBytes.length;
         head.nDestDataLen = aesBytes.length;
-
+        logger.debug(head.getBytes());
+        logger.debug(aesBytes);
         var data = utils.sumArray(head.getBytes(), aesBytes);
-        logger.debug('NetManager.prototype.send');
         logger.debug(data);
         me.socket.write(data);
       });
