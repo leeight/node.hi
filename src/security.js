@@ -137,15 +137,38 @@ exports.setAesKey = function(aes_key) {
  * @param {int} length 解密之后的长度.
  */
 exports.AESDecrypt = function(encryptedData, length) {
-  var msg = [];
+  var decipher = crypto.createDecipher("aes128", AES_KEY);
+  var first = new Buffer(decipher.update(encryptedData, 'binary', 'binary'), 'binary');
+  var last = new Buffer(decipher.final('binary'), 'binary');
 
-  var decipher = crypto.createDecipher("aes128", argv.password);
-  msg.push(decipher.update(encryptedData, 'binary', 'binary'));
-  msg.push(decipher.final('binary'));
+  var buffer = new Buffer(first.length + last.length);
+  first.copy(buffer, 0, 0, first.length);
+  last.copy(buffer, first.length, 0, last.length);
 
-  // TODO 校验长度是否正确
+  // FIXME(leeight) 校验长度是否正确
 
-  return new Buffer(msg);
+  return buffer;
+}
+
+/**
+ * @param {Buffer|string} bytes
+ */
+exports.AESEncrypt = function(bytes) {
+  if (!Buffer.isBuffer(bytes)) {
+    bytes = new Buffer(bytes, 'utf-8');
+  }
+
+  var cipher = crypto.createCipher("aes128", AES_KEY);
+  cipher.setAutoPadding(true);
+
+  var first = new Buffer(cipher.update(bytes, 'binary', 'binary'), 'binary');
+  var last = new Buffer(cipher.final('binary'), 'binary');
+
+  var buffer = new Buffer(first.length + last.length);
+  first.copy(buffer, 0, 0, first.length);
+  last.copy(buffer, first.length, 0, last.length);
+
+  return buffer;
 }
 
 /**
@@ -169,6 +192,74 @@ exports.encryptPassword = function(password) {
   md5sum.update(second);
 
   return md5sum.digest('hex');
+}
+
+/**
+ * @param {Buffer} zipedData 压缩之后的数据.
+ * @param {int} length 解压缩之后的长度.
+ * @param {Function} callback
+ */
+exports.decompressData = function(zipedData, length, callback) {
+  var zlib = require('zlib');
+  zlib.inflate(zipedData, function(err, buffer){
+    if (err) {
+      throw err;
+    }
+
+    if (buffer.length != length) {
+      // FIXME(leeight) 如何处理呢?
+      // return null;
+    }
+
+    callback(buffer);
+  });
+}
+
+/**
+ * @param {Buffer|string} bytes
+ * @param {Function} callback
+ */
+exports.compressData = function(bytes, callback) {
+  if (!Buffer.isBuffer(bytes)) {
+    bytes = new Buffer(bytes, 'utf-8');
+  }
+  var zlib = require('zlib');
+  var deflate = zlib.createDeflate({
+    level: zlib.Z_BEST_COMPRESSION
+  });
+
+  var output = [];
+  var size = 0;
+  deflate.on('error', function(){
+    deflate.removeAllListeners();
+    deflate = null;
+  });
+  deflate.on('data', function(chunk){
+    output.push(chunk);
+    size += chunk.length;
+  });
+  deflate.on('end', function(){
+    var buffer;
+    switch(output.length) {
+      case 0:
+        buffer = new Buffer(0);
+        break;
+      case 1:
+        buffer = output[0];
+        break;
+      default:
+        buffer = new Buffer(size);
+        var offset = 0;
+        output.forEach(function(chunk){
+          chunk.copy(buffer, offset, 0, chunk.length);
+          offset += chunk.length;
+        });
+        break;
+    }
+    callback(buffer);
+  });
+  deflate.write(bytes);
+  deflate.end();
 }
 
 

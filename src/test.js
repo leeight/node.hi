@@ -15,11 +15,8 @@
  *  
  **/
 var net = require('net')
-var protocol = require('./protocol');
 var command = require('./command');
 var constant = require('./constant');
-var security = require('./security');
-var utils = require('./utils');
 var lnet = require('./lnet');
 var logger = require('./logger').logger;
 
@@ -49,78 +46,7 @@ console.log(pubkey.getModulus());
 process.exit(0);
 */
 
-
-/**
- * 是否出于握手阶段
- */
-var IS_HAND_SHAKE = false;
-
-/**
- * 是否握手成功
- */
-var IS_HAND_SHAKE_OK = false;
-
-/**
- * S2阶段获取到的HAND_SHAKE_KEY
- */
-var HAND_SHAKE_KEY = null;
-
-/**
- * Client生成的公钥
- */
-var S3_PUBKEY_BYTE = null;
-
-var S3_PRIKEY_BYTE = null;
-
-var S3_KEYPAIR = null;
-
 var NET_MANAGER;
-
-function sendHandshakeS1(socket) {
-  var handshakeHeadS1 = new protocol.S1Data();
-  var s1DataByte = handshakeHeadS1.getBytes();
-
-  var packetHeadS1 = protocol.PacketHead.S1;
-  packetHeadS1.nDestDataLen = s1DataByte.length;
-  packetHeadS1.nSrcDataLen = s1DataByte.length;
-  packetHeadS1.nZipDataLen = s1DataByte.length;
-
-  var handshakeS1 = new protocol.Packet(packetHeadS1, handshakeHeadS1, null);
-  var bytes = handshakeS1.getBytes();
-
-  socket.write(bytes);
-}
-
-function sendHandshakeS3(socket) {
-  var pair = security.getKeyPair();
-
-  S3_PUBKEY_BYTE = pair[0];
-  S3_PRIKEY_BYTE = pair[1];
-  S3_KEYPAIR = pair[2];
-
-  // 默认的RSA_PKCS1_OAEP_PADDING是有问题的, 需要使用RSA_PKCS1_PADDING
-  var k1 = HAND_SHAKE_KEY.encrypt(new Buffer(S3_PUBKEY_BYTE.slice(0, 100)), undefined, undefined, 1);
-  var k2 = HAND_SHAKE_KEY.encrypt(new Buffer(S3_PUBKEY_BYTE.slice(100, 140)), undefined, undefined, 1);
-
-  var key = utils.sumArray(k1, k2);
-  var handshakeBodyS3 = new protocol.HandshakeBody();
-  handshakeBodyS3.keyData = key;
-
-  var handshakeHeadS3 = new protocol.S3Data();
-  handshakeHeadS3.nDataLen = handshakeBodyS3.keyData.length;
-  handshakeHeadS3.nReserved1 = 0;
-  handshakeHeadS3.nReserved2 = 0;
-
-  var packetHeadS3 = protocol.PacketHead.S3;
-  var s3DataByte = handshakeHeadS3.getBytes();
-  packetHeadS3.nSendFlag = constant.ECtSendFlags.CT_SEND_FLAG_HANDSHAKE;
-  packetHeadS3.nDestDataLen = s3DataByte.length + handshakeBodyS3.getLength();
-  packetHeadS3.nSrcDataLen = s3DataByte.length + handshakeBodyS3.getLength();
-  packetHeadS3.nZipDataLen = s3DataByte.length + handshakeBodyS3.getLength();
-
-  var handshakeS3 = new protocol.Packet(packetHeadS3, handshakeHeadS3, handshakeBodyS3);
-  socket.write(handshakeS3.getBytes());
-}
 
 function login() {
   var msg = new command.VerifyCommand(constant.VerifyCodeType.VerifyCodeLogin, 0, 'linuxracer', 0, 0);
@@ -129,83 +55,19 @@ function login() {
 }
 
 var socket = net.createConnection(1863, "m3.im.baidu.com");
-socket.on('data', function (d) {
-    logger.debug('receiving data');
-    var head = protocol.PacketHead.createFromBytes(d);
-    switch(head.ctFlag) {
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK:
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES:
-        length = head.nDestDataLen;
-        break;
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES:
-        length = head.nZipDataLen;
-        break;
-      default:
-        length = head.nSrcDataLen;
-        break;
-    }
-    logger.debug(head);
-
-    var packet = protocol.PacketFactory.getInstance().create(head,
-        d.slice(constant.ProtocolConstant.PAKECT_HEAD_LENGTH));
-    if (!packet) {
-      logger.error('invalid packet :-(');
-      return;
-    }
-
-    logger.debug(packet);
-    switch(packet.packetHead.ctFlag) {
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_S2: {
-        logger.debug('Received HandshakeS2');
-        var s2 = packet.handshakeHead;
-        var keyNo = s2.nRootKeyNO;
-        var byteKey = constant.IM_RootPubKeyData_PEM[keyNo];
-        HAND_SHAKE_KEY = security.decodeDataToKey(packet.handshakeBody.keyData,
-          security.publicKey(byteKey));
-        sendHandshakeS3(this);
-        break;
-      }
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_S4: {
-        logger.debug('Received HandshakeS4');
-        var s4 = packet.handshakeHead;
-        security.setMd5Seed(s4.seed);
-
-        var s4body = packet.handshakeBody;
-        var encryptedAESKey = s4body.keyData;
-        security.setAesKey(S3_KEYPAIR.decrypt(encryptedAESKey, undefined, undefined, 1));
-        IS_HAND_SHAKE_OK = true;
-
-        NET_MANAGER = new lnet.NetManager(this);
-
-        // this.write(protocol.Packet.keepAlive.getBytes());
-        login();
-        break;
-      }
-      case constant.ECtFlagConnectStates.CT_FLAG_KEEPALIVE: {
-        break;
-      }
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK:
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES:
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES:
-      case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_NOAES: {
-        break;
-      }
-      default: {
-        logger.error('Invalid packet');
-        break;
-      }
-    }
-});
 socket.on('connect', function (connect) {
-    logger.debug('connection established');
-    isHandshake = true;
-    sendHandshakeS1(this);
+  logger.debug('connection established');
+  NET_MANAGER = new lnet.NetManager(this);
+  NET_MANAGER.on('finish_handshake', function(){
+    login();
+  });
+  NET_MANAGER.startHandshake();
 });
 socket.on('error', function (error) {
-    logger.error(error);
+  logger.error(error);
 });
 socket.on('end', function () {
-    logger.debug('socket closing...');
+  logger.debug('socket closing...');
 });
 socket.setKeepAlive(true, 1000);
 

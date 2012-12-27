@@ -454,28 +454,6 @@ function PacketFactory() {
 base.addSingletonGetter(PacketFactory);
 
 /**
- * @param {Buffer} encryptedData 加密的数据.
- * @param {int} length 解密之后的长度.
- */
-PacketFactory.prototype.decrypt = function(encryptedData, length) {
-  return security.AESDecrypt(encryptedData, length);
-}
-
-/**
- * @param {Buffer} zipedData 压缩之后的数据.
- * @param {int} length 解压缩之后的长度.
- */
-PacketFactory.prototype.decompress = function(zipedData, length) {
-  var zlib = require('zlib');
-  var original = zlib.inflate(zipedData);
-  if (original.length != length) {
-    // FIXME 如何处理呢?
-    return null;
-  }
-  return original;
-}
-
-/**
  * @type {PacketHead} head
  * @type {Buffer} bytes
  */
@@ -525,13 +503,13 @@ PacketFactory.prototype.create = function(head, bytes) {
       logger.debug('get message CT_FLAG_CON_OK');
 
       var dataOK = bytes.slice(0, head.nDestDataLen);
-      var decryptedData = this.decrypt(dataOK, head.nZipDataLen);
+      var decryptedData = security.AESDecrypt(dataOK, head.nZipDataLen);
       if (!decryptedData) {
         logger.error('invalid CT_FLAG_CON_OK packet, decrypt failed!');
         break;
       }
 
-      var decompressData = this.decompress(decryptedData, head.nSrcDataLen);
+      var decompressData = security.decompressData(decryptedData, head.nSrcDataLen);
       if (!decompressData) {
         logger.error('invalid CT_FLAG_CON_OK packet, decompress failed!');
       }

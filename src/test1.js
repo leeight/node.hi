@@ -85,6 +85,26 @@ security.setMd5Seed(new Buffer([1,2,3]));
 console.log(security.encryptPassword("leeight"));
 console.log(security.encryptPassword("你好"));
 
+security.compressData('hello world, 你好世界', function(zipedData){
+  console.log(zipedData.length);
+  console.log(zipedData);
+
+  security.decompressData(zipedData, zipedData.length, function(original){
+    console.log(original);
+    console.log(original.toString('utf-8'));
+    console.log(original.length);
+  });
+});
+
+
+console.log('== hello world ==');
+security.setAesKey([1,2,3,4,5,6,7]);
+var z = security.AESEncrypt("hello world, 你好世界");
+console.log(z);
+var k = security.AESDecrypt(z);
+console.log(k);
+console.log(k.toString('utf-8'));
+
 
 
 

@@ -14,7 +14,12 @@
  * @description 
  *  
  **/
+var events = require('events');
+var base = require('./base');
 var protocol = require('./protocol');
+var constant = require('./constant');
+var security = require('./security');
+var utils = require('./utils');
 var logger = require('./logger').logger;
 
 /**
@@ -23,8 +28,28 @@ var logger = require('./logger').logger;
 function NetManager(socket) {
   this.socket = socket;
 
+  /**
+   * 是否处于握手阶段
+   * @type {boolean}
+   */
+  this.IS_HAND_SHAKE = false;
+
+  /**
+   * 是否握手成功
+   * @type {boolean}
+   */
+  this.IS_HAND_SHAKE_OK = false;
+
+  /**
+   * S2阶段获取到的HAND_SHAKE_KEY
+   */
+  this.HAND_SHAKE_KEY;
+
+  this.socket.on('data', this.onData.bind(this));
+
   this.sendedCommand = {};
 }
+base.inherits(NetManager, events.EventEmitter);
 NetManager.messageId = 1;
 
 /**
@@ -32,6 +57,110 @@ NetManager.messageId = 1;
  */
 NetManager.getNextId = function() {
   return NetManager.messageId ++;
+}
+
+NetManager.prototype.onData = function(bytes) {
+  logger.debug('receiving data');
+
+  var packet = this.decode(bytes);
+
+  // TunnelEventHandler.java
+  switch(packet.packetHead.ctFlag) {
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_S2: {
+      logger.debug('Received HandshakeS2');
+      var s2 = packet.handshakeHead;
+      var keyNo = s2.nRootKeyNO;
+      var byteKey = constant.IM_RootPubKeyData_PEM[keyNo];
+      this.HAND_SHAKE_KEY = security.decodeDataToKey(packet.handshakeBody.keyData,
+        security.publicKey(byteKey));
+      this.sendHandshakeS3();
+      break;
+    }
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_S4: {
+      logger.debug('Received HandshakeS4');
+      var s4 = packet.handshakeHead;
+      security.setMd5Seed(s4.seed);
+
+      var s4body = packet.handshakeBody;
+      var encryptedAESKey = s4body.keyData;
+      security.setAesKey(this.S3_KEYPAIR.decrypt(encryptedAESKey, undefined, undefined, 1));
+      this.finishHandshake();
+      break;
+    }
+    case constant.ECtFlagConnectStates.CT_FLAG_KEEPALIVE: {
+      break;
+    }
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK:
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES:
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES:
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_NOAES: {
+      break;
+    }
+    default: {
+      logger.error('Invalid packet');
+      break;
+    }
+  }
+}
+
+NetManager.prototype.startHandshake = function() {
+  this.IS_HAND_SHAKE = true;
+  this.sendHandshakeS1();
+}
+
+NetManager.prototype.sendHandshakeS1 = function() {
+  var handshakeHeadS1 = new protocol.S1Data();
+  var s1DataByte = handshakeHeadS1.getBytes();
+
+  var packetHeadS1 = protocol.PacketHead.S1;
+  packetHeadS1.nDestDataLen = s1DataByte.length;
+  packetHeadS1.nSrcDataLen = s1DataByte.length;
+  packetHeadS1.nZipDataLen = s1DataByte.length;
+
+  var handshakeS1 = new protocol.Packet(packetHeadS1, handshakeHeadS1, null);
+  this.send(handshakeS1);
+}
+
+NetManager.prototype.sendHandshakeS3 = function() {
+  var pair = security.getKeyPair();
+
+  this.S3_PUBKEY_BYTE = pair[0];
+  this.S3_PRIKEY_BYTE = pair[1];
+  this.S3_KEYPAIR = pair[2];
+
+  // 默认的RSA_PKCS1_OAEP_PADDING是有问题的, 需要使用RSA_PKCS1_PADDING
+  var k1 = this.HAND_SHAKE_KEY.encrypt(new Buffer(this.S3_PUBKEY_BYTE.slice(0, 100)),
+           undefined, undefined, 1);
+  var k2 = this.HAND_SHAKE_KEY.encrypt(new Buffer(this.S3_PUBKEY_BYTE.slice(100, 140)),
+           undefined, undefined, 1);
+
+  var key = utils.sumArray(k1, k2);
+  var handshakeBodyS3 = new protocol.HandshakeBody();
+  handshakeBodyS3.keyData = key;
+
+  var handshakeHeadS3 = new protocol.S3Data();
+  handshakeHeadS3.nDataLen = handshakeBodyS3.keyData.length;
+  handshakeHeadS3.nReserved1 = 0;
+  handshakeHeadS3.nReserved2 = 0;
+
+  var packetHeadS3 = protocol.PacketHead.S3;
+  var s3DataByte = handshakeHeadS3.getBytes();
+  packetHeadS3.nSendFlag = constant.ECtSendFlags.CT_SEND_FLAG_HANDSHAKE;
+  packetHeadS3.nDestDataLen = s3DataByte.length + handshakeBodyS3.getLength();
+  packetHeadS3.nSrcDataLen = s3DataByte.length + handshakeBodyS3.getLength();
+  packetHeadS3.nZipDataLen = s3DataByte.length + handshakeBodyS3.getLength();
+
+  var handshakeS3 = new protocol.Packet(packetHeadS3, handshakeHeadS3, handshakeBodyS3);
+  this.send(handshakeS3);
+}
+
+/**
+ * 握手成功.
+ */
+NetManager.prototype.finishHandshake = function() {
+  this.IS_HAND_SHAKE = false;
+  this.IS_HAND_SHAKE_OK = true;
+  this.emit('finish_handshake');
 }
 
 NetManager.prototype.cacheCommand = function(command) {
@@ -45,17 +174,86 @@ NetManager.prototype.removeCommand = function(seq) {
 }
 
 /**
+ * @param {Packet} packet
+ */
+NetManager.prototype.send = function(packet) {
+  // BaiduHiEncoder.java
+  if (this.IS_HAND_SHAKE) {
+    this.socket.write(packet.getBytes());
+  } else {
+    var head = packet.packetHead;
+    if (head.ctFlag === constant.ECtFlagConnectStates.CT_FLAG_KEEPALIVE) {
+      this.socket.write(head.getBytes());
+    } else {
+      var msg = packet.message;
+      var msgBytes = msg.getBytes();
+      var me = this;
+      security.compressData(msgBytes, function(zipBytes){
+        var aesBytes = security.AESEncrypt(zipBytes);
+        head.nSrcDataLen = msgBytes.length;
+        head.nZipDataLen = zipBytes.length;
+        head.nDestDataLen = aesBytes.length;
+
+        var data = utils.sumArray(head.getBytes(), aesBytes);
+        logger.debug('NetManager.prototype.send');
+        logger.debug(data);
+        me.socket.write(data);
+      });
+    }
+  }
+}
+
+/**
  * @param {BaseCommand} command
  */
 NetManager.prototype.sendMessage = function(command) {
   var packet = new protocol.Packet();
   packet.packetHead = protocol.PacketHead.MESSAGE;
   var msg = command.createCommand();
-  logger.debug(msg);
+  logger.debug(JSON.stringify(msg));
   packet.message = new protocol.Message(new Buffer(msg, 'utf-8'));
-  this.socket.write(packet.getBytes());
+  this.send(packet);
   this.cacheCommand(command);
   return command.seq;
+}
+
+/**
+ * @param {Buffer} bytes
+ * @return {Packet}
+ */
+NetManager.prototype.decode = function(bytes) {
+  var head = protocol.PacketHead.createFromBytes(bytes);
+  switch(head.ctFlag) {
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK:
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES:
+      length = head.nDestDataLen;
+      break;
+    case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES:
+      length = head.nZipDataLen;
+      break;
+    default:
+      length = head.nSrcDataLen;
+      break;
+  }
+  logger.debug(head);
+
+  var packet = protocol.PacketFactory.getInstance().create(head,
+      bytes.slice(constant.ProtocolConstant.PAKECT_HEAD_LENGTH));
+  if (!packet) {
+    logger.error('invalid packet :-(');
+    return;
+  }
+
+  logger.debug(packet);
+
+  return packet;
+}
+
+/**
+ * @param {Packet} packet
+ * @return {Buffer}
+ */
+NetManager.prototype.encode = function(packet) {
 }
 
 exports.NetManager = NetManager;

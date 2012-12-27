@@ -16,9 +16,7 @@
  **/
 
 exports.inherits = function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+  require('util').inherits(d, b);
 };
 
 exports.addSingletonGetter = function(ctor) {
