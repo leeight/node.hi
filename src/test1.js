@@ -115,13 +115,16 @@ security.compressData('hello world, 你好世界', function(zipedData){
 
 
 console.log('== hello world ==');
-security.setAesKey([1,2,3,4,5,6,7]);
+security.setAesKey([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
 var z = security.AESEncrypt("hello world, 你好世界");
 console.log(z);
 var k = security.AESDecrypt(z);
 console.log(k);
 console.log(k.toString('utf-8'));
 
+var all = require('./logic/all');
+console.log(all);
+all.all();
 
 
 

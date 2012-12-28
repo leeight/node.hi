@@ -14,10 +14,11 @@
  * @description 
  *  
  **/
-var base = require('./base');
-var utils = require('./utils');
-var constant = require('./constant');
-var logger = require('./logger').logger;
+var events = require('events');
+var base = require('../base');
+var utils = require('../utils');
+var constant = require('../constant');
+var logger = require('../logger').logger;
 
 function BaseResponse() {
   /**
@@ -78,6 +79,7 @@ function BaseResponse() {
 
   this.responseHead = {};
 }
+base.inherits(BaseResponse, events.EventEmitter);
 BaseResponse.SEPARATED = "\r\n";
 BaseResponse.SEMICOLON = ":";
 BaseResponse.SPACE = " ";

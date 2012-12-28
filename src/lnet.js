@@ -21,12 +21,15 @@ var constant = require('./constant');
 var security = require('./security');
 var utils = require('./utils');
 var logger = require('./logger').logger;
-var response = require('./response');
+var response = require('./response/all');
+var logic = require('./logic/all');
 
 /**
  * @param {Socket} socket
  */
 function NetManager(socket) {
+  events.EventEmitter.call(this);
+
   this.socket = socket;
 
   /**
@@ -56,6 +59,12 @@ function NetManager(socket) {
    * @type {Object.<string, ??>}
    */
   this._messageHandlers = {};
+
+  /**
+   * Business logic instances
+   * @type {Array.<Object>}
+   */
+  this._receivers = [];
 }
 base.inherits(NetManager, events.EventEmitter);
 NetManager.messageId = 1;
@@ -135,8 +144,9 @@ NetManager.prototype._registerMessageHandlers = function() {
   this._messageHandlers['contact_notify'] = 'ContactNotifyResponse';
   this._messageHandlers['contact_query'] = 'ContactQueryResponse';
   this._messageHandlers['timestamp_user'] = 'TimestampResponse';
-
   // TODO...
+
+  this._receivers = logic.all();
 }
 
 /**
@@ -151,12 +161,24 @@ NetManager.prototype.dispatchMessage = function(msg) {
   }
 
   var protocolType = (res.superCommand + '_' + res.command).toLowerCase();
+
+  logger.debug('protocolType = [' + protocolType + ']');
+
+  logger.debug(this._messageHandlers);
+
   if (this._messageHandlers[protocolType]) {
     var klassName = this._messageHandlers[protocolType];
     var ctor = response[klassName];
-    var instance = new ctor(res);
+    if (ctor) {
+      var instance = new ctor(res);
+      logger.debug(instance);
 
-    // dispatch instance to receivers
+      // dispatch instance to receivers
+      var me = this;
+      this._receivers.forEach(function(receiver){
+        receiver.emit('message', instance, me);
+      });
+    }
   }
 }
 
@@ -221,6 +243,10 @@ NetManager.prototype.finishHandshake = function() {
   this.emit('finish_handshake');
 }
 
+NetManager.prototype.findCommand = function(seq) {
+  return this.sendedCommand[seq];
+}
+
 NetManager.prototype.cacheCommand = function(command) {
   this.sendedCommand[command.seq] = command;
 }
@@ -265,6 +291,9 @@ NetManager.prototype.send = function(packet) {
  * @param {BaseCommand} command
  */
 NetManager.prototype.sendMessage = function(command) {
+  logger.debug('NetManager.prototype.sendMessage');
+  logger.debug(command);
+
   var packet = new protocol.Packet();
   packet.packetHead = protocol.PacketHead.MESSAGE;
   var msg = command.createCommand();

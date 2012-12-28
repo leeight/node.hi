@@ -110,6 +110,21 @@ exports.testIndexOf = function(test) {
   test.done();
 }
 
+exports.testXmlParser = function(test) {
+  var xml = "<verify v_url=\"AA2C62500072FB3FBE0D0BEAA4C68CB45EE9DB473259C00A32B22F074A858B4C651EA1D4F749482F743C7746FB0B44C68C818297F13B572C15EC2B\" v_time=\"1356664841\" v_period=\"96733780b7286e0a2d47bb5a2ef2bfce\" v_code=\"EU56\" />";
+
+  var DOMParser = require('xmldom').DOMParser;
+  var doc = new DOMParser().parseFromString(xml);
+  var verify = doc.documentElement;
+  test.equal("AA2C62500072FB3FBE0D0BEAA4C68CB45EE9DB473259C00A32B22F074A858B4C651EA1D4F749482F743C7746FB0B44C68C818297F13B572C15EC2B", 
+    verify.getAttribute('v_url'));
+  test.equal("1356664841", verify.getAttribute("v_time"));
+  test.equal("96733780b7286e0a2d47bb5a2ef2bfce", verify.getAttribute("v_period"));
+  test.equal("EU56", verify.getAttribute("v_code"));
+
+  test.done();
+}
+
 
 
 

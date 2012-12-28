@@ -208,9 +208,6 @@ VerifyCommand.prototype.createCommandBody = function() {
   return null;
 }
 
-// var vc = new VerifyCommand(1, 100, 'leeight', 89, 64);
-// logger.debug(vc);
-// logger.debug(JSON.stringify(vc.createCommand()));
 
 
 /**
@@ -295,19 +292,6 @@ LoginCommand.prototype.createCommandBody = function() {
   return buffer.join('');
 }
 
-/*
-var lc = new LoginCommand('url', 'time', 'period', 'code', {
-  priority: 8964,
-  account: 'leeight',
-  password: 'password',
-  imversion: '1,2,3,4',
-  redirect_times: '0',
-  platform: 'android',
-  client_type: 4,
-  new_username: 'new_username'
-});
-logger.debug(lc.createCommand());
-*/
 
 
 

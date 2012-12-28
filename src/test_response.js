@@ -14,7 +14,7 @@
  * @description 
  *  
  **/
-var response = require('./response');
+var response = require('./response/all');
 var utils = require('./utils');
 
 exports.testIndexOf = function(test) {

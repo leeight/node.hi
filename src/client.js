@@ -19,11 +19,16 @@ var command = require('./command');
 var constant = require('./constant');
 var lnet = require('./lnet');
 var logger = require('./logger').logger;
+var user = require('./user');
 
 var NET_MANAGER;
 
+var USER = user.User.getInstance();
+USER.account = 'linuxracer';
+USER.password = 'zhenxi';
+
 function login() {
-  var msg = new command.VerifyCommand(constant.VerifyCodeType.VerifyCodeLogin, 0, 'linuxracer', 0, 0);
+  var msg = new command.VerifyCommand(constant.VerifyCodeType.VerifyCodeLogin, 0, USER.account, 0, 0);
   var seq = NET_MANAGER.sendMessage(msg);
   logger.debug('login command seq = [' + seq + ']');
 }
@@ -31,6 +36,7 @@ function login() {
 var socket = net.createConnection(1863, "m1.im.baidu.com");
 socket.on('connect', function (connect) {
   logger.debug('connection established');
+
   NET_MANAGER = new lnet.NetManager(this);
   NET_MANAGER.on('finish_handshake', function(){
     login();
