@@ -525,6 +525,19 @@ PacketFactory.prototype.create = function(head, bytes) {
     }
 
     case ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES: {
+      logger.debug('get message CT_FLAG_CON_OK_NOZIP_DOAES');
+      var dataOK = bytes.slice(0, head.nDestDataLen);
+      logger.debug(dataOK.toString('base64'));
+      var decryptedData = security.AESDecrypt(dataOK, head.nSrcDataLen);
+      if (!decryptedData) {
+        logger.error('invalid CT_FLAG_CON_OK_NOZIP_NOAES packet, decrypt failed!');
+        break;
+      }
+      logger.debug(decryptedData.toString('ascii'));
+
+      packet = new Packet();
+      packet.packetHead = head;
+      packet.message = new Message(decryptedData);
       break;
     }
 

@@ -18,12 +18,15 @@
 var ursa = require('ursa');
 var crypto = require('crypto');
 var utils = require('./utils');
+var logger = require('./logger').logger;
 
 var PUBKEY_PREFIX = new Buffer([
   0x30,0x81,0x9F,0x30,0x0D,0x06,0x09,0x2A,
   0x86,0x48,0x86,0xF7,0x0D,0x01,0x01,0x01,
   0x05,0x00,0x03,0x81,0x8D,0x00
 ]);
+
+var AES_ALGORITHM = 'aes-128-ecb';
 
 function format(msg) {
   return msg.replace(/^----.*/gm, '').replace(/\r?\n/g, '');
@@ -128,6 +131,7 @@ var AES_KEY = null;
  * @param {Buffer} aes_key
  */
 exports.setAesKey = function(aes_key) {
+  logger.warn(aes_key);
   AES_KEY = new Buffer(aes_key);
 }
 
@@ -137,19 +141,43 @@ exports.setAesKey = function(aes_key) {
  * @param {int} length 解密之后的长度.
  */
 exports.AESDecrypt = function(encryptedData, length) {
-  var decipher = crypto.createDecipher("aes128", AES_KEY);
+  var decipher = crypto.createDecipheriv(AES_ALGORITHM, AES_KEY, "");
+  decipher.setAutoPadding(false);
   var first = new Buffer(decipher.update(encryptedData, 'binary', 'binary'), 'binary');
   var last = new Buffer(decipher.final('binary'), 'binary');
 
   var buffer = new Buffer(first.length + last.length);
+  buffer.fill(0);
   first.copy(buffer, 0, 0, first.length);
   last.copy(buffer, first.length, 0, last.length);
 
   // FIXME(leeight) 校验长度是否正确
   if (buffer.length != length) {
-    throw new Error('AESDecrypt failed, dst length = [' + length +
-      '], buffer length = [' + buffer.length + ']');
+    return buffer.slice(0, length);
   }
+
+  /*
+  {
+  if (buffer.length > length) {
+    var tmp = new Buffer(buffer.length - length);
+    buffer.copy(tmp, 0, length);
+    var flag = false;
+    for(var i = 0; i < tmp.length; i ++) {
+      if (tmp[i] != 0) {
+        flag = true;
+        break;
+      }
+    }
+    if (!flag) {
+      console.log(flag);
+    } else {
+      console.log(tmp);
+    }
+  }
+  throw new Error('AESDecrypt failed, dst length = [' + length +
+    '], buffer length = [' + buffer.length + ']');
+  }
+  */
 
   return buffer;
 }
@@ -162,8 +190,8 @@ exports.AESEncrypt = function(bytes) {
     bytes = new Buffer(bytes, 'utf-8');
   }
 
-  var cipher = crypto.createCipher("aes128", AES_KEY);
-  cipher.setAutoPadding(true);
+  var cipher = crypto.createCipheriv(AES_ALGORITHM, AES_KEY, "");
+  // cipher.setAutoPadding(true);
 
   var first = new Buffer(cipher.update(bytes, 'binary', 'binary'), 'binary');
   var last = new Buffer(cipher.final('binary'), 'binary');
