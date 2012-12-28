@@ -18,6 +18,7 @@ var security = require('./security');
 var ursa = require('ursa');
 var constant = require('./constant');
 var logger = require('./logger').logger;
+var utils = require('./utils');
 
 // 'security 1.0 R 1\nmethod:verify\nuid:0\nlid:leeight\nuid2:0\ntype:1\n\r\n'
 var messageBytes = new Buffer([115, 101, 99, 117, 114, 105, 116, 121, 32, 49, 46, 48, 32, 82, 32, 49, 10, 109, 101, 116, 104, 111, 100, 58, 118, 101, 114, 105, 102, 121, 10, 117, 105, 100, 58, 48, 10, 108, 105, 100, 58, 108, 101, 101, 105, 103, 104, 116, 10, 117, 105, 100, 50, 58, 48, 10, 116, 121, 112, 101, 58, 49, 10, 13, 10]);
@@ -98,6 +99,16 @@ exports.testAESDecrypt0 = function(test) {
   test.done();
 }
 
+exports.testIndexOf = function(test) {
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([3,4])), 2);
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([3])), 2);
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([1,2,3])), 0);
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([0,1,2,3])), -1);
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([1,2,3,4])), 0);
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([1,2,3,4,5])), 0);
+  test.equal(utils.indexOf(new Buffer([1,2,3,4,5]), new Buffer([1,2,3,4,5,6])), -1);
+  test.done();
+}
 
 
 

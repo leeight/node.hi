@@ -27,6 +27,49 @@ exports.sumArray = function(a, b) {
   return c;
 }
 
+exports.stripInvalidChars = function(xml) {
+  var array = [
+    '00', '01', '02', '03', '04', '05', '06', '07',
+    '08', '0b', '0B', '0c', '0C', '0e', '0E', '0f',
+    '0F', '10', '11', '12', '13', '14', '15', '16',
+    '17', '18', '19', '1a', '1b', '1B', '1c', '1C',
+    '1d', '1D', '1e', '1E', '1f', '1F', '0d', '0a',
+    '1A'
+  ];
+  var pattern = new RegExp('&#x' + array.join('|&#x'), 'gi');
+  return xml.replace(pattern, '');
+}
+
+/**
+ * @param {Buffer} a
+ * @param {Buffer} b
+ */
+exports.indexOf = function(a, b) {
+  if (a.length < b.length) {
+    return -1;
+  } else if (a.length === b.length) {
+    for(var i = 0; i < a.length; i ++) {
+      if (a[i] !== b[i]) {
+        return -1;
+      }
+    }
+    return 0;
+  } else {
+    var al = a.length;
+    var bl = b.length;
+
+    for(var i = 0; i < al; i ++) {
+      if (a[i] === b[0]) {
+        for(var j = 0; (a[i + j] === b[j]) && ((i + j) < al) && (j < bl); j ++);
+        if (j === bl) {
+          return i;
+        }
+      }
+    }
+  }
+  return -1;
+}
+
 
 
 

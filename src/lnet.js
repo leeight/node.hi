@@ -21,6 +21,7 @@ var constant = require('./constant');
 var security = require('./security');
 var utils = require('./utils');
 var logger = require('./logger').logger;
+var response = require('./response');
 
 /**
  * @param {Socket} socket
@@ -48,6 +49,13 @@ function NetManager(socket) {
   this.socket.on('data', this.onData.bind(this));
 
   this.sendedCommand = {};
+
+  /**
+   * key => protocolType
+   * val => class | function | string
+   * @type {Object.<string, ??>}
+   */
+  this._messageHandlers = {};
 }
 base.inherits(NetManager, events.EventEmitter);
 NetManager.messageId = 1;
@@ -65,7 +73,6 @@ NetManager.prototype.onData = function(bytes) {
 
   var packet = this.decode(bytes);
 
-  // TunnelEventHandler.java
   switch(packet.packetHead.ctFlag) {
     case constant.ECtFlagConnectStates.CT_FLAG_CON_S2: {
       logger.debug('Received HandshakeS2');
@@ -89,18 +96,67 @@ NetManager.prototype.onData = function(bytes) {
       break;
     }
     case constant.ECtFlagConnectStates.CT_FLAG_KEEPALIVE: {
+      // TODO(leeight)
       break;
     }
     case constant.ECtFlagConnectStates.CT_FLAG_CON_OK:
     case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_DOZIP_NOAES:
     case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES:
     case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_NOAES: {
+      this.dispatchMessage(packet.message);
       break;
     }
     default: {
       logger.error('Invalid packet');
       break;
     }
+  }
+}
+
+/**
+ * 注册消息的处理函数.
+ */
+NetManager.prototype._registerMessageHandlers = function() {
+  this._messageHandlers['security_verify'] = 'VerifyResponse';
+  this._messageHandlers['login_login'] = 'LoginResponse';
+  this._messageHandlers['login_kickout'] = 'KickoutResponse';
+  this._messageHandlers['user_login_ready'] = 'LoginReadyResponse';
+  this._messageHandlers['friend_get_friend'] = 'FriendGetFriendResponse';
+  this._messageHandlers['friend_get_block'] = 'FriendGetBlockResponse';
+  this._messageHandlers['friend_get_team'] = 'FriendGetTeamResponse';
+  this._messageHandlers['friend_add'] = 'FriendAddResponse';
+  this._messageHandlers['friend_add_ack'] = 'FriendAddAckResponse';
+  this._messageHandlers['friend_friend_change'] = 'FriendChangeResponse';
+  this._messageHandlers['user_query'] = 'UserQueryReponse';
+  this._messageHandlers['query_offline_msg_count'] = 'OfflineMsgCountResponse';
+  this._messageHandlers['query_get_offline_msg'] = 'OfflineMsgResponse';
+  this._messageHandlers['user_set'] = 'UserSetResponse';
+  this._messageHandlers['friend_set'] = 'FriendInfoUpdateResponse';
+  this._messageHandlers['contact_notify'] = 'ContactNotifyResponse';
+  this._messageHandlers['contact_query'] = 'ContactQueryResponse';
+  this._messageHandlers['timestamp_user'] = 'TimestampResponse';
+
+  // TODO...
+}
+
+/**
+ * @param {Message} msg
+ */
+NetManager.prototype.dispatchMessage = function(msg) {
+  var res = response.BaseResponse.createResponse(msg.data);
+  if (res.code === constant.StausCode.SERVER_ERROR ||
+      res.code === constant.StausCode.IM_UNKNOWN) {
+    logger.error('invalid res.code = [' + res.code + ']');
+    return;
+  }
+
+  var protocolType = (res.superCommand + '_' + res.command).toLowerCase();
+  if (this._messageHandlers[protocolType]) {
+    var klassName = this._messageHandlers[protocolType];
+    var ctor = response[klassName];
+    var instance = new ctor(res);
+
+    // dispatch instance to receivers
   }
 }
 
@@ -161,6 +217,7 @@ NetManager.prototype.sendHandshakeS3 = function() {
 NetManager.prototype.finishHandshake = function() {
   this.IS_HAND_SHAKE = false;
   this.IS_HAND_SHAKE_OK = true;
+  this._registerMessageHandlers();
   this.emit('finish_handshake');
 }
 

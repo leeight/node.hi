@@ -131,7 +131,7 @@ var AES_KEY = null;
  * @param {Buffer} aes_key
  */
 exports.setAesKey = function(aes_key) {
-  logger.warn(aes_key);
+  logger.info(aes_key);
   AES_KEY = new Buffer(aes_key);
 }
 
@@ -151,7 +151,7 @@ exports.AESDecrypt = function(encryptedData, length) {
   first.copy(buffer, 0, 0, first.length);
   last.copy(buffer, first.length, 0, last.length);
 
-  // FIXME(leeight) 校验长度是否正确
+  // FIXME(leeight) 校验长度是否正确, 去掉多余的00000, 我很纠结...
   if (buffer.length != length) {
     return buffer.slice(0, length);
   }
