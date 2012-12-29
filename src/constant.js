@@ -64,7 +64,7 @@ exports.VerifyCodeType = {
   VerifyCodeTmpSession : 11             // 发送临时会话消息，需要携带uid2
 }
 
-exports.StausCode = {
+exports.StatusCode = {
   SUCCESS: 200,
   HAS_MORE: 210,
 
@@ -96,6 +96,12 @@ exports.StausCode = {
   FILE_NOT_EXISTS: 10005,
   FILE_READ_ERROR: 10006
 };
+
+exports.USER_STATUS_ONLINE = 1;
+exports.USER_STATUS_BUSY = 2;
+exports.USER_STATUS_LEAVE = 3;
+exports.USER_STATUS_HIDE = 4;
+exports.USER_STATUS_OFFLINE = 5;
 
 /**
  * 预置的8对公钥(PEM)格式

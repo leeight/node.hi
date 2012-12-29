@@ -52,6 +52,12 @@ exports.testLoginCommand = function(test) {
   test.done();
 }
 
+exports.testUserSetStatus = function(test) {
+  var ussc = new command.UserSetStatus(constant.USER_STATUS_ONLINE, '你好, 我在线', 8964);
+  test.equal(ussc.createCommand(), 'user 2.0 R 4\nmethod:set\ncontent-length:77\ncontent-type:text\nuid:8964\n\r\n<user><account status="1;&#20320;&#22909;, &#25105;&#22312;&#32447;"/></user>');
+  test.done();
+}
+
 
 
 

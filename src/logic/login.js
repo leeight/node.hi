@@ -50,7 +50,60 @@ base.inherits(Login, events.EventEmitter);
 
 Login.prototype._onLogin = function(response, nm) {
   logger.debug('Login.prototype._onLogin');
-  // TODO
+  switch(response.code) {
+    case constant.StatusCode.SUCCESS: {
+      var client = nm.getClient();
+      client.getUser().imid = response.imid;
+      client.emit('login_success');
+      break;
+    }
+    case constant.StatusCode.PASSWORD_ERROR:
+    case constant.StatusCode.PROTOCOL_ERROR: {
+      logger.error('invalid password');
+      // TODO 看情况刷新验证码
+      break;
+    }
+    case constant.StatusCode.VCODE_ERROR: {
+      logger.error('invalid verify code');
+      // TODO 刷新验证码
+      break;
+    }
+    case constant.StatusCode.VCODE_TIME_OUT: {
+      logger.error('verify code timeout');
+      break;
+    }
+    case constant.StatusCode.NO_USER_NAME: {
+      logger.error('constant.StatusCode.NO_USER_NAME');
+      break;
+    }
+    case constant.StatusCode.USERNAME_ALREADY_USED: {
+      logger.error('constant.StatusCode.USERNAME_ALREADY_USED');
+      break;
+    }
+    case constant.StatusCode.NO_USER: {
+      logger.error('constant.StatusCode.NO_USER');
+      break;
+    }
+    case constant.StatusCode.LOW_VERSION: {
+      logger.error('constant.StatusCode.LOW_VERSION');
+      break;
+    }
+    case constant.StatusCode.CANNT_LOGIN: {
+      logger.error('constant.StatusCode.CANNT_LOGIN');
+      break;
+    }
+    case constant.StatusCode.SERVER_ERROR: {
+      logger.error('constant.StatusCode.SERVER_ERROR');
+      break;
+    }
+    case constant.StatusCode.NOT_ACTIVATING: {
+      logger.error('constant.StatusCode.NOT_ACTIVATING');
+      break;
+    }
+    default: {
+      break;
+    }
+  }
 }
 
 Login.prototype._onVerify = function(response, nm) {
@@ -65,15 +118,15 @@ Login.prototype._onVerify = function(response, nm) {
   }
 
   switch(response.code) {
-    case constant.StausCode.NO_USER: {
+    case constant.StatusCode.NO_USER: {
       logger.error('no such user.');
       break;
     }
-    case constant.StausCode.PROTOCOL_ERROR: {
+    case constant.StatusCode.PROTOCOL_ERROR: {
       logger.error('invalid password');
       break;
     }
-    case constant.StausCode.SUCCESS: {
+    case constant.StatusCode.SUCCESS: {
       logger.debug('verify command passed');
       nm.removeCommand(seq);
 
@@ -87,7 +140,7 @@ Login.prototype._onVerify = function(response, nm) {
       } else {
         // 直接返回验证码了, 不需要用户输入, 直接登陆
         nm.sendMessage(new command.LoginCommand(this.url, this.time,
-          this.period, response.verify_code, user.User.getInstance()));
+          this.period, response.verify_code, nm.getClient().getUser()));
       }
     }
   }

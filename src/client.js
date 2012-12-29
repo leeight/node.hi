@@ -20,36 +20,82 @@ var constant = require('./constant');
 var lnet = require('./lnet');
 var logger = require('./logger').logger;
 var user = require('./user');
+var base = require('./base');
+var events = require('events');
 
-var NET_MANAGER;
+/**
+ * @constructor
+ */
+function Client() {
+  events.EventEmitter.call(this);
 
-var USER = user.User.getInstance();
-USER.account = 'linuxracer';
-USER.password = 'zhenxi';
+  /**
+   * @type {User}
+   */
+  this.user;
 
-function login() {
-  var msg = new command.VerifyCommand(constant.VerifyCodeType.VerifyCodeLogin, 0, USER.account, 0, 0);
-  var seq = NET_MANAGER.sendMessage(msg);
-  logger.debug('login command seq = [' + seq + ']');
+  /**
+   * @type {lnet.NetManager}
+   */
+  this.nm;
+
+  /**
+   * @type {Socket}
+   */
+  this.socket;
+
+  this.on('finish_handshake', this._onFinishHandShake.bind(this));
+  this.on('login_success', this._onLoginSuccess.bind(this));
+}
+base.inherits(Client, events.EventEmitter);
+
+Client.prototype.getUser = function() {
+  return this.user;
 }
 
-var socket = net.createConnection(1863, "m1.im.baidu.com");
-socket.on('connect', function (connect) {
-  logger.debug('connection established');
+/**
+ * 登陆成功了, 可以设置状态了.
+ */
+Client.prototype._onLoginSuccess = function() {
+  var msg = new command.UserSetStatus(constant.USER_STATUS_ONLINE,
+    '你好, 我在线, 哈哈', this.user.imid);
+  this.nm.sendMessage(msg);
+}
 
-  NET_MANAGER = new lnet.NetManager(this);
-  NET_MANAGER.on('finish_handshake', function(){
-    login();
+/**
+ * 网路层握手成功, 可以尝试登陆了.
+ */
+Client.prototype._onFinishHandShake = function() {
+  var msg = new command.VerifyCommand(constant.VerifyCodeType.VerifyCodeLogin,
+    0, this.user.account, 0, 0);
+  this.nm.sendMessage(msg);
+}
+
+Client.prototype.start = function() {
+  var me = this;
+
+  this.socket = net.createConnection(1863, "m1.im.baidu.com");
+  this.nm = new lnet.NetManager(this.socket, this);
+
+  this.socket.on('connect', function (connect) {
+    logger.debug('connection established');
+    me.nm.startHandshake();
   });
-  NET_MANAGER.startHandshake();
+  this.socket.on('error', function (error) {
+    logger.error(error);
+  });
+  this.socket.on('end', function () {
+    logger.debug('socket closing...');
+  });
+  this.socket.setKeepAlive(true, 1000);
+}
+
+var client = new Client();
+client.user = new user.User('linuxracer', 'zhenxi');
+client.on('login_success', function(){
+  logger.debug('client.user.imid = [' + this.user.imid + ']');
 });
-socket.on('error', function (error) {
-  logger.error(error);
-});
-socket.on('end', function () {
-  logger.debug('socket closing...');
-});
-socket.setKeepAlive(true, 1000);
+client.start();
 
 
 

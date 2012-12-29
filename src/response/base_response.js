@@ -110,7 +110,7 @@ BaseResponse._getStatusCode = function(code) {
     case 481:
       return code;
     case 408:
-      return constant.StausCode.NO_USER;
+      return constant.StatusCode.NO_USER;
     case 406:
     case 413:
     case 421:
@@ -136,10 +136,10 @@ BaseResponse._getStatusCode = function(code) {
     case 522:
     case 523:
     case 524:
-      return constant.StausCode.SERVER_ERROR;
+      return constant.StatusCode.SERVER_ERROR;
     default:
       /** 未录入错误返回 **/
-      return constant.StausCode.IM_UNKNOWN;
+      return constant.StatusCode.IM_UNKNOWN;
   }
 }
 
@@ -169,6 +169,7 @@ BaseResponse.createResponse = function(bytes) {
   logger.debug('response.xml = [' + JSON.stringify(response.xml) + ']');
 
   var lines = header.split(/\r?\n/g);
+  console.log(lines);
   if (!lines.length) {
     logger.error('invalid header');
     return;
@@ -187,11 +188,13 @@ BaseResponse.createResponse = function(bytes) {
   response.seq = parseInt(method[3], 10);
 
   for(var i = 1; i < lines.length; i ++) {
-    var chunks = lines[i].split(BaseResponse.SEMICOLON);
-    if (chunks.length === 2) {
-      response.responseHead[chunks[0]] = chunks[1];
-    } else {
-      logger.error('invalid header line = [' + lines[i] + ']');
+    if (lines[i]) {
+      var chunks = lines[i].split(BaseResponse.SEMICOLON);
+      if (chunks.length === 2) {
+        response.responseHead[chunks[0]] = chunks[1];
+      } else {
+        logger.error('invalid header line = [' + lines[i] + ']');
+      }
     }
   }
 

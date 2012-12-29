@@ -16,9 +16,11 @@
  **/
 var base_response = require('./base_response');
 var verify_response = require('./verify_response');
+var login_response = require('./login_response');
 
 exports.BaseResponse = base_response.BaseResponse;
 exports.VerifyResponse = verify_response.VerifyResponse;
+exports.LoginResponse = login_response.LoginResponse;
 
 
 

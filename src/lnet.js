@@ -26,11 +26,14 @@ var logic = require('./logic/all');
 
 /**
  * @param {Socket} socket
+ * @param {Client} client
  */
-function NetManager(socket) {
+function NetManager(socket, client) {
   events.EventEmitter.call(this);
 
   this.socket = socket;
+
+  this._client = client;
 
   /**
    * 是否处于握手阶段
@@ -74,6 +77,10 @@ NetManager.messageId = 1;
  */
 NetManager.getNextId = function() {
   return NetManager.messageId ++;
+}
+
+NetManager.prototype.getClient = function() {
+  return this._client;
 }
 
 NetManager.prototype.onData = function(bytes) {
@@ -154,8 +161,8 @@ NetManager.prototype._registerMessageHandlers = function() {
  */
 NetManager.prototype.dispatchMessage = function(msg) {
   var res = response.BaseResponse.createResponse(msg.data);
-  if (res.code === constant.StausCode.SERVER_ERROR ||
-      res.code === constant.StausCode.IM_UNKNOWN) {
+  if (res.code === constant.StatusCode.SERVER_ERROR ||
+      res.code === constant.StatusCode.IM_UNKNOWN) {
     logger.error('invalid res.code = [' + res.code + ']');
     return;
   }
@@ -163,8 +170,6 @@ NetManager.prototype.dispatchMessage = function(msg) {
   var protocolType = (res.superCommand + '_' + res.command).toLowerCase();
 
   logger.debug('protocolType = [' + protocolType + ']');
-
-  logger.debug(this._messageHandlers);
 
   if (this._messageHandlers[protocolType]) {
     var klassName = this._messageHandlers[protocolType];
@@ -178,6 +183,8 @@ NetManager.prototype.dispatchMessage = function(msg) {
       this._receivers.forEach(function(receiver){
         receiver.emit('message', instance, me);
       });
+    } else {
+      logger.warn('response.' + klassName + ' is undefined');
     }
   }
 }
@@ -240,7 +247,7 @@ NetManager.prototype.finishHandshake = function() {
   this.IS_HAND_SHAKE = false;
   this.IS_HAND_SHAKE_OK = true;
   this._registerMessageHandlers();
-  this.emit('finish_handshake');
+  this.getClient().emit('finish_handshake');
 }
 
 NetManager.prototype.findCommand = function(seq) {
@@ -291,7 +298,7 @@ NetManager.prototype.send = function(packet) {
  * @param {BaseCommand} command
  */
 NetManager.prototype.sendMessage = function(command) {
-  logger.debug('NetManager.prototype.sendMessage');
+  logger.debug('NetManager.prototype.sendMessage, login command seq = [' + command.seq + ']');
   logger.debug(command);
 
   var packet = new protocol.Packet();

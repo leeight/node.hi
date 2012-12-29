@@ -19,6 +19,17 @@ exports.inherits = function (d, b) {
   require('util').inherits(d, b);
 };
 
+exports.mixin = function(target, source) {
+  for(var p in source) {
+    if (source.hasOwnProperty(p)) {
+      if (typeof target[p] === 'undefined') {
+        target[p] = source[p];
+      }
+    }
+  }
+  return target;
+}
+
 exports.addSingletonGetter = function(ctor) {
   ctor.getInstance = function() {
     if (ctor.instance_) {

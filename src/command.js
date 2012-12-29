@@ -292,6 +292,35 @@ LoginCommand.prototype.createCommandBody = function() {
   return buffer.join('');
 }
 
+/**
+ * @param {int} status 状态.
+ * @param {string} msg 签名.
+ * @param {int} imid 用户的id.
+ * @extends {BaseCommand}
+ */
+function UserSetStatus(status, msg, imid) {
+  BaseCommand.call(this, "user", "set", "2.0");
+
+  /**
+   * @type {int}
+   */
+  this.status = status;
+
+  /**
+   * @type {string}
+   */
+  this.msg = msg;
+
+  this.addCommandHead("uid", imid);
+}
+base.inherits(UserSetStatus, BaseCommand);
+
+UserSetStatus.prototype.createCommandBody = function() {
+  var status = this.status + (!this.msg ? '' : ';' + this.msg);
+  var statusValue = require('entities').encode(status, 0);
+  return '<user><account status="' + statusValue + '"/></user>';
+}
+
 
 
 
@@ -311,6 +340,7 @@ LoginCommand.prototype.createCommandBody = function() {
 exports.BaseCommand = BaseCommand;
 exports.LoginCommand = LoginCommand;
 exports.VerifyCommand = VerifyCommand;
+exports.UserSetStatus = UserSetStatus;
 
 
 /* vim: set ts=4 sw=4 sts=4 tw=100: */

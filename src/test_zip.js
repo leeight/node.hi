@@ -125,6 +125,12 @@ exports.testXmlParser = function(test) {
   test.done();
 }
 
+exports.testEntitiesModule = function(test) {
+  test.equal(require('entities').encode("WORLD\x00\x01\"<>&HELLO, 你好, 世界", 0),
+    "WORLD&#0;&#1;&quot;&lt;&gt;&amp;HELLO, &#20320;&#22909;, &#19990;&#30028;");
+  test.done();
+}
+
 
 
 
