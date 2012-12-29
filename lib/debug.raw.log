@@ -278,3 +278,9 @@ TypeError: Cannot read property 'length' of undefined
   'uid:16897023',
   'waitack:120' ]
 
+<msg><font n=\"宋体\" s=\"10\" b=\"0\" i=\"0\" ul=\"0\" c=\"0\" cs=\"134\"/><cface md5=\"aad26cf6fd56d30d69b7b5d7ffa0df9c\" n=\"aad26cf6fd\" t=\"gif\"/><text c=\"\"/></msg>
+<msg><font n=\"宋体\" s=\"10\" b=\"0\" i=\"0\" ul=\"0\" c=\"0\" cs=\"134\"/><face id=\"d30\" n=\"委屈\"/><text c=\"\"/></msg>
+"<msg><font n=\"宋体\" s=\"10\" b=\"0\" i=\"0\" ul=\"0\" c=\"0\" cs=\"134\" /><url ref=\"http://www.google.com\" c=\"http://www.google.com\" linkid=\"session:url:addd461c-8eb6-40d5-a161-91466243cf6e\" t=\"2\" /></msg>"
+"<msg><font n=\"宋体\" s=\"10\" b=\"0\" i=\"0\" ul=\"0\" c=\"0\" cs=\"134\"/><reply t=\"2\" c=\"http://www.google.com \" n=\"\"/><text c=\"\r\n你好\"/></msg>\u0000"
+
+header = ["msg 1.2 N 442\r\naddon:status=5\r\nbasemsgid:3935677034\r\ncontent-length:161\r\ncontent-type:text\r\nfrom:16897023\r\nfrom_sub:0\r\nmethod:msg_notify\r\nmsgid:5\r\nnextsubid:0\r\nsubid:0\r\nsys_sess:00340100abcd010050dfe54d0101d3ff000000000a4112453e80000050dfdc410000000000000000000000000000000000000000\r\ntime:1356850508600\r\nto:114960740\r\ntype:1\r\nuid:16897023\r\nwaitack:120"]

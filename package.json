@@ -1,0 +1,21 @@
+{
+  "name": "hi-nodejs",
+  "version": "0.0.1",
+  "dependencies": {
+    "socket.io": "0.9.13",
+    "express": "3.0.5",
+    "jade": "0.27.6",
+    "less": "stable"
+  },
+  "description": "Baidu Hi Client On Node.JS",
+  "homepage": "http://git.jumbo.ws/chrome-apps/chrome-apps",
+  "repository": {
+    "type": "git",
+    "url": "http://git.jumbo.ws/chrome-apps/chrome-apps.git"
+  },
+  "author": {
+    "name": "leeight",
+    "email": "leeight@gmail.com",
+    "url": "http://leeight.github.com/"
+  }
+}

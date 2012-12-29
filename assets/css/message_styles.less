@@ -1,0 +1,136 @@
+/***************************************************************************
+ * 
+ * Copyright (c) 2012 Baidu.com, Inc. All Rights Reserved
+ * $Id$ 
+ * 
+ **************************************************************************/
+ 
+ 
+ 
+/**
+ * assets/css/message_styles.less ~ 2012/12/30 15:41:02
+ * @author leeight(liyubei@baidu.com)
+ * @version $Revision$ 
+ * @description 
+ *  
+ **/
+@import-once "bootstrap/mixins.less";
+
+html, body {
+  #font > .sans-serif();
+}
+
+.threads {
+  width: 542px;
+}
+
+.message {
+  .clearfix();
+
+  margin-bottom: 20px;
+  position: relative;
+
+  .content {
+    padding: 6px 15px;
+    width: 430px;
+
+    .border-radius(4px);
+    .box-shadow(1px 1px 3px 0px rgba(0,0,0,.5));
+  }
+
+  .indicator {
+    width: 13px;
+    height: 11px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .bd {
+    padding: 5px 0;
+  }
+
+  .bd:first-child {
+    border-top: none !important;
+  }
+
+  .bd:last-child {
+    border-bottom: none !important;
+  }
+
+  time {
+    display: block;
+    text-align: right;
+    font-style: italic;
+    font-size: 10px;
+    color: @gray;
+  }
+}
+.incoming {
+  .avatar {
+    float: left;
+    margin-right: 8px;
+  }
+  .indicator {
+    display: block;
+    position: absolute;
+    left: 28px;
+    top: 7px;
+    background: url(../images/incoming_indicator.png);
+  }
+  .content {
+    float: left;
+    margin-right: 40px;
+    background-color: #f3f9e8;
+    border: 1px solid #bdda81;
+    #gradient > .vertical(#f3f9e8, darken(#f3f9e8, 10%));
+  }
+  .bd {
+    border-bottom: 1px solid #e2efc4;
+    border-top: 1px solid white;
+  }
+}
+.outcoming {
+  .avatar {
+    float: right;
+    margin-left: 8px;
+  }
+  .indicator {
+    display: block;
+    position: absolute;
+    right: 28px;
+    top: 7px;
+    background: url(../images/outcoming_indicator.png);
+  }
+  .content {
+    float: right;
+    margin-left: 40px;
+    background-color: #f9f9e8;
+    border: 1px solid #e7e394;
+    #gradient > .vertical(#f9f9e8, darken(#f9f9e8, 10%));
+  }
+  .bd {
+    border-bottom: 1px solid #f4f0a7;
+    border-top: 1px solid white;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* vim: set ts=4 sw=4 sts=4 tw=100: */
