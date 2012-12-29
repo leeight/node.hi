@@ -52,8 +52,6 @@ function NetManager(socket, client) {
    */
   this.HAND_SHAKE_KEY;
 
-  this.socket.on('data', this.onData.bind(this));
-
   this.sendedCommand = {};
 
   /**
@@ -68,6 +66,11 @@ function NetManager(socket, client) {
    * @type {Array.<Object>}
    */
   this._receivers = [];
+
+  this._bytes;
+
+  this.socket.on('data', this.onData.bind(this));
+  this.on('new_packet', this.onNewPacket.bind(this));
 }
 base.inherits(NetManager, events.EventEmitter);
 NetManager.messageId = 1;
@@ -84,11 +87,28 @@ NetManager.prototype.getClient = function() {
 }
 
 NetManager.prototype.onData = function(bytes) {
-  logger.debug('receiving data');
-  logger.debug(bytes);
+  logger.debug('NetManager.prototype.onData');
+  var buffer;
+  if (this._bytes && this._bytes.length > 0) {
+    buffer = new Buffer(this._bytes.length + bytes.length);
+    this._bytes.copy(buffer, 0, 0, this._bytes.length);
+    bytes.copy(buffer, this._bytes.length, 0, bytes.length);
+  } else {
+    buffer = new Buffer(bytes);
+  }
+  this._bytes = buffer;
 
-  var packet = this.decode(bytes);
+  logger.debug('receiving data, length = [' + this._bytes.length + ']');
+  logger.debug(this._bytes.toString('base64'));
 
+  this.decode();
+}
+
+/**
+ * 从Buffer里面解析出新的Packet之后的回调函数, 因为decode数据
+ * 可能是异步的哦, 亲...
+ */
+NetManager.prototype.onNewPacket = function(packet) {
   switch(packet.packetHead.ctFlag) {
     case constant.ECtFlagConnectStates.CT_FLAG_CON_S2: {
       logger.debug('Received HandshakeS2');
@@ -160,6 +180,11 @@ NetManager.prototype._registerMessageHandlers = function() {
  * @param {Message} msg
  */
 NetManager.prototype.dispatchMessage = function(msg) {
+  if (!msg.data) {
+    logger.error('invalid message, msg.data is undefined');
+    return;
+  }
+
   var res = response.BaseResponse.createResponse(msg.data);
   if (res.code === constant.StatusCode.SERVER_ERROR ||
       res.code === constant.StatusCode.IM_UNKNOWN) {
@@ -186,6 +211,8 @@ NetManager.prototype.dispatchMessage = function(msg) {
     } else {
       logger.warn('response.' + klassName + ' is undefined');
     }
+  } else {
+    logger.warn('NetManager._messageHandlers[' + protocolType + '] is undefined.');
   }
 }
 
@@ -284,8 +311,8 @@ NetManager.prototype.send = function(packet) {
         head.nSrcDataLen = msgBytes.length;
         head.nZipDataLen = zipBytes.length;
         head.nDestDataLen = aesBytes.length;
-        logger.debug(head.getBytes());
-        logger.debug(aesBytes);
+        // logger.debug(head.getBytes());
+        // logger.debug(aesBytes);
         var data = utils.sumArray(head.getBytes(), aesBytes);
         logger.debug(data);
         me.socket.write(data);
@@ -312,11 +339,24 @@ NetManager.prototype.sendMessage = function(command) {
 }
 
 /**
- * @param {Buffer} bytes
  * @return {Packet}
  */
-NetManager.prototype.decode = function(bytes) {
-  var head = protocol.PacketHead.createFromBytes(bytes);
+NetManager.prototype.decode = function() {
+  logger.debug('NetManager.prototype.decode');
+
+  var bufferSize = this._bytes.length;
+  var packetHeadLength = constant.ProtocolConstant.PACKET_HEAD_LENGTH;
+
+  if (bufferSize < packetHeadLength) {
+    // 太小了, 包头都不够
+    logger.error('bufferSize = [' + bufferSize + '], packetHeadLength = [' +
+      packetHeadLength + ']');
+    return false;
+  }
+
+  var head = protocol.PacketHead.createFromBytes(this._bytes);
+  var length = 0;
+
   switch(head.ctFlag) {
     case constant.ECtFlagConnectStates.CT_FLAG_CON_OK:
     case constant.ECtFlagConnectStates.CT_FLAG_CON_OK_NOZIP_DOAES:
@@ -329,18 +369,26 @@ NetManager.prototype.decode = function(bytes) {
       length = head.nSrcDataLen;
       break;
   }
+
   logger.debug(head);
 
-  var packet = protocol.PacketFactory.getInstance().create(head,
-      bytes.slice(constant.ProtocolConstant.PAKECT_HEAD_LENGTH));
-  if (!packet) {
-    logger.error('invalid packet :-(');
-    return;
+  if (bufferSize < (length + packetHeadLength)) {
+    logger.error('bufferSize = [' + bufferSize + '], length = [' + length +
+      '], packetHeadLength = [' + packetHeadLength + ']')
+    return false;
   }
 
-  logger.debug(packet);
-
-  return packet;
+  var me = this;
+  protocol.PacketFactory.getInstance().create(head,
+    this._bytes.slice(packetHeadLength), function(packet){
+    if (!packet) {
+      logger.error('invalid packet :-(');
+    } else {
+      logger.debug(packet);
+      me._bytes = me._bytes.slice(length + packetHeadLength);
+      me.emit('new_packet', packet);
+    }
+  });
 }
 
 /**

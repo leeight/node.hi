@@ -209,3 +209,72 @@ login 4.2 R 3\nmethod:login\ncontent-length:171\ncontent-type:text\nv_url:url\nv
 
 WORLD&#0;&#1;&quot;&lt;&gt;&amp;HELLO, &#20320;&#22909;, &#19990;&#30028;
 WORLD&#0;&#1;&quot;&lt;&gt;HELLO, &#20320;&#22909;, &#19990;&#30028;
+384+40
+
+[2012-12-29 15:37:00.447] [DEBUG] [default] - receiving data, length = [424]
+[2012-12-29 15:37:00.447] [DEBUG] [default] - <Buffer 00 00 01 00 31 56 4d 49 1f 00 00 00 77 06 00 00 78 01 00 00 80 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 42 3b bf bd 24 9c 58 88 f2 3a d1 ...>
+[2012-12-29 15:37:00.449] [DEBUG] [default] - { nVer: '\u0000\u0000\u0001\u0000',
+  nTag: '1VMI',
+  bEncrypt: 1,
+  bCompress: 1,
+  bHeartBeat: 1,
+  nReserved26: 26,
+  nSendFlag: 0,
+  nCategory: 0,
+  nReserved1: 0,
+  nReserved2: 0,
+  ctFlag: 31,
+  nSrcDataLen: 1655,
+  nZipDataLen: 376,
+  nDestDataLen: 384 }
+[2012-12-29 15:37:00.449] [DEBUG] [default] - get message CT_FLAG_CON_OK
+[2012-12-29 15:37:00.450] [ERROR] [default] - invalid CT_FLAG_CON_OK packet, decompress failed!
+[2012-12-29 15:37:00.450] [DEBUG] [default] - { packetHead: 
+   { nVer: '\u0000\u0000\u0001\u0000',
+     nTag: '1VMI',
+     bEncrypt: 1,
+     bCompress: 1,
+     bHeartBeat: 1,
+     nReserved26: 26,
+     nSendFlag: 0,
+     nCategory: 0,
+     nReserved1: 0,
+     nReserved2: 0,
+     ctFlag: 31,
+     nSrcDataLen: 1655,
+     nZipDataLen: 376,
+     nDestDataLen: 384 },
+  handshakeHead: undefined,
+  handshakeBody: undefined,
+  message: { data: undefined } }
+
+/home/leeight/work/svn/app/mobile/hi/chrome-apps/src/response/base_response.js:152
+  var length = bytes.length;
+                    ^
+TypeError: Cannot read property 'length' of undefined
+    at Function.BaseResponse.createResponse (/home/leeight/work/svn/app/mobile/hi/chrome-apps/src/response/base_response.js:152:21)
+    at NetManager.dispatchMessage (/home/leeight/work/svn/app/mobile/hi/chrome-apps/src/lnet.js:178:35)
+    at NetManager.onData (/home/leeight/work/svn/app/mobile/hi/chrome-apps/src/lnet.js:137:12)
+    at Socket.EventEmitter.emit (events.js:88:17)
+    at TCP.onread (net.js:396:14)
+    at process.startup.processMakeCallback.process._makeCallback (node.js:248:20)
+
+
+[ 'msg 1.2 N 558',
+  'addon:status=2',
+  'basemsgid:3836574952',
+  'content-length:153',
+  'content-type:text',
+  'from:16897023',
+  'from_sub:0',
+  'method:msg_notify',
+  'msgid:29',
+  'nextsubid:0',
+  'subid:0',
+  'sys_sess:00340100abcd010050dea5b10101d3ff000000000a1a34153e80000050de61290000000000000000000000000000000000000000',
+  'time:1356768688979',
+  'to:114960740',
+  'type:1',
+  'uid:16897023',
+  'waitack:120' ]
+

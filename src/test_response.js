@@ -92,7 +92,39 @@ exports.testMixin = function(test) {
   test.ok(!rv.responseHead['code']);
 
   test.done();
+}
 
+exports.testUserQueryReponse = function(test) {
+  var xml = [
+    '<user uid="20079852">',
+      '<account ',
+          'baiduid="Lucifer52xue" ',
+          'personal_comment="y3##(#d9到时候好伤心很喜欢十九世纪手机电视基督教我问问你到家加拿大刚到家豆浆机小姐很纠结呼吸机先进性九鼎记多久饭ijkfkfcet刚开学喝好几回和谐不及格好好学习天天向上回电话好像" ',
+          'birthday="1982-8-25" ',
+          'email="" ',
+          'head="6bd038f40d79bffab19a1b7af3560b54;丹顶鹤;jpg" ',
+          'name="" ',
+          'nickname="" ',
+          'phone="" ',
+          'sex="1" ',
+          'email_fixed="0" />',
+    '</user>'
+  ].join('');
+  var uqr = new response.UserQueryReponse({
+    xml: xml
+  });
+  var user = uqr.getUser();
+  test.equal(user.imid, 20079852);
+  test.equal(user.account, 'Lucifer52xue');
+  test.equal(user.personal_comment, 'y3##(#d9到时候好伤心很喜欢十九世纪手机电视基督教我问问你到家加拿大刚到家豆浆机小姐很纠结呼吸机先进性九鼎记多久饭ijkfkfcet刚开学喝好几回和谐不及格好好学习天天向上回电话好像');
+  test.equal(user.birthday, '1982-8-25');
+  test.equal(user.email, '');
+  test.equal(user.avatar, '6bd038f40d79bffab19a1b7af3560b54.jpg');
+  test.equal(user.name, '');
+  test.equal(user.nickname, '');
+  test.equal(user.phone, '');
+  test.equal(user.sex, 1);
+  test.done();
 }
 
 

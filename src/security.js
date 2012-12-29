@@ -203,6 +203,12 @@ exports.AESEncrypt = function(bytes) {
   return buffer;
 }
 
+exports.md5sum = function(message) {
+  var hash = crypto.createHash('md5');
+  hash.update(message, 'utf-8');
+  return hash.digest('hex');
+}
+
 /**
  * @param {string} password
  * @return {string}
@@ -234,16 +240,12 @@ exports.encryptPassword = function(password) {
 exports.decompressData = function(zipedData, length, callback) {
   var zlib = require('zlib');
   zlib.inflate(zipedData, function(err, buffer){
-    if (err) {
-      throw err;
-    }
-
     if (buffer.length != length) {
       // FIXME(leeight) 如何处理呢?
       // return null;
     }
 
-    callback(buffer);
+    callback(err, buffer);
   });
 }
 

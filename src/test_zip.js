@@ -59,7 +59,7 @@ exports.testCompressData1 = function(test) {
 exports.testCompressData2 = function(test) {
   var text = '你好世界';
   security.compressData(text, function(actual){
-    security.decompressData(actual, actual.length, function(last){
+    security.decompressData(actual, actual.length, function(err, last){
       test.equal(last, text);
       test.done();
     });
@@ -128,6 +128,13 @@ exports.testXmlParser = function(test) {
 exports.testEntitiesModule = function(test) {
   test.equal(require('entities').encode("WORLD\x00\x01\"<>&HELLO, 你好, 世界", 0),
     "WORLD&#0;&#1;&quot;&lt;&gt;&amp;HELLO, &#20320;&#22909;, &#19990;&#30028;");
+  test.done();
+}
+
+exports.testGetSoftwareUUID = function(test) {
+  var md5 = '3c4292ae95be58e0c58e4e5511f09647';
+  test.equal(utils.getSoftwareUUID(md5), 'HI3C4292AE95BE58E028E6C58E4E5511F09647');
+  test.equal(security.md5sum("hello world."), md5);
   test.done();
 }
 

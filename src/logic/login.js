@@ -44,9 +44,54 @@ function Login() {
 
   this.on('_on_verify', this._onVerify.bind(this));
   this.on('_on_login', this._onLogin.bind(this));
+  this.on('_on_user_set', this._onUserSet.bind(this));
+  this.on('_on_user_login_ready', this._onUserLoginReady.bind(this));
+  this.on('_on_user_query', this._onUserQuery.bind(this));
   this.on('message', this.onMessage.bind(this));
 }
 base.inherits(Login, events.EventEmitter);
+
+Login.prototype._onUserQuery = function(response, nm) {
+  logger.debug('Login.prototype._onUserQuery');
+  if (response.code === constant.StatusCode.SUCCESS) {
+    nm.getClient().emit('user_query', response);
+  }
+
+  nm.getClient().setStatus(constant.LOGIN_READLY);
+}
+
+Login.prototype._onUserLoginReady = function(response, nm) {
+  logger.debug('Login.prototype._onUserLoginReady');
+  if (response.code !== constant.StatusCode.SUCCESS) {
+    logger.error('login_ready status error.');
+    nm.getClient().setStatus(constant.OFFLINE);
+    return;
+  }
+}
+
+Login.prototype._onUserSet = function(response, nm) {
+  logger.debug('Login.prototype._onUserSet');
+  switch(response.code) {
+    case constant.StatusCode.SUCCESS: {
+      logger.info('constant.StatusCode.SUCCESS');
+      var cmd = nm.findCommand(response.seq);
+      nm.getClient().getUser().user_status = cmd.status;
+      nm.removeCommand(response.seq);
+      break;
+    }
+    default: {
+      logger.error('user_set failed, response.code = [' + response.code + ']');
+      break;
+    }
+  }
+
+  if (nm.getClient().getStatus() === constant.LOGIN_READLY) {
+    return;
+  }
+
+  nm.getClient().setStatus(constant.LOGIN_READLY);
+  nm.getClient().emit('login_ready');
+}
 
 Login.prototype._onLogin = function(response, nm) {
   logger.debug('Login.prototype._onLogin');
@@ -153,13 +198,16 @@ Login.prototype._onVerify = function(response, nm) {
 Login.prototype.onMessage = function(response, nm) {
   var cmd = response.command;
   var protocolType = (response.superCommand + '_' + cmd).toLowerCase();
+  logger.debug('Login.prototype.onMessage');
+  logger.debug('cmd = [' + cmd + ']');
+  logger.debug('protocolType = [' + protocolType + ']');
 
   switch(cmd) {
     case 'verify':
     case 'login':
     case 'kickout':
       this.emit('_on_' + cmd, response, nm);
-      break;
+      return;
   }
 
   switch(protocolType) {
@@ -168,8 +216,10 @@ Login.prototype.onMessage = function(response, nm) {
     case 'user_query':
     case 'query_offline_msg_count':
       this.emit('_on_' + protocolType, response, nm);
-      break;
+      return;
   }
+
+  logger.error('invalid cmd = [' + cmd + '] or protocolType = [' + protocolType + ']');
 }
 
 exports.Login = Login;

@@ -29,7 +29,7 @@ function BaseResponse() {
   /**
    * @type {string}
    */
-  this.command = "";
+  this.command;
 
   /**
    * @type {string}

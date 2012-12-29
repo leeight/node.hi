@@ -46,7 +46,7 @@ exports.ProtocolConstant = {
     CON_METHOD_A : [2, 0, 0, 0],        // RSA交换密钥, AES加密 ZIP(compress)压缩
     CT_TAG : '1VMI',                    // ??
     BIN_PRO_VER_1_0 : 1,                // 1.0
-    PAKECT_HEAD_LENGTH : 40             // pack_head (OnePacket) 长度
+    PACKET_HEAD_LENGTH : 40             // pack_head (OnePacket) 长度
 }
 
 exports.VerifyCodeType = {
@@ -97,11 +97,29 @@ exports.StatusCode = {
   FILE_READ_ERROR: 10006
 };
 
+exports.QueryFields = {
+  USER_QUERY_FIELDS: "baiduid;personal_comment;birthday;email;head;name;nickname;phone;sex",
+  FRIEND_QUERY_FIELDS: "baiduid;status;personal_comment;nickname;head;name;birthday;personal_desc;sex;cli_type;email",
+  GROUP_QUERY_FIELDS: "name;online;total",
+};
+
+// User Statuses
 exports.USER_STATUS_ONLINE = 1;
 exports.USER_STATUS_BUSY = 2;
 exports.USER_STATUS_LEAVE = 3;
 exports.USER_STATUS_HIDE = 4;
 exports.USER_STATUS_OFFLINE = 5;
+
+// Client Statuses
+exports.NO_NETWORK = 1;
+exports.CONNECTING = 2;
+exports.RETRY = 3;
+exports.NOT_CONNECTION = 4;
+exports.HANDSHAKE = 5;
+exports.CONNECTION_OK = 6;
+exports.LOGINFAILD = 7;
+exports.LOGIN_READLY = 8;
+exports.OFFLINE = 9;
 
 /**
  * 预置的8对公钥(PEM)格式

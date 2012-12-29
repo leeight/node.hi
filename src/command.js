@@ -19,6 +19,7 @@ var base = require('./base');
 var lnet = require('./lnet');
 var constant = require('./constant');
 var security = require('./security');
+var utils = require('./utils');
 var logger = require('./logger').logger;
 
 /**
@@ -321,6 +322,49 @@ UserSetStatus.prototype.createCommandBody = function() {
   return '<user><account status="' + statusValue + '"/></user>';
 }
 
+/**
+ * @param {User} user
+ */
+function LoginReadyCommand(user) {
+  BaseCommand.call(this, "user", "login_ready", "2.0");
+
+  this._user = user;
+
+  this.addCommandHead("uid", user.imid);
+}
+base.inherits(LoginReadyCommand, BaseCommand);
+
+/**
+ * <login><user status="uint32_t;string" imversion="imver_t" localeid="uint16_t" pc_hash="uint64_t" /></login>
+ */
+LoginReadyCommand.prototype.createCommandBody = function() {
+  var entities = require('entities');
+  var user = this._user;
+  var pc_hash = utils.getSoftwareUUID(security.md5sum(user.account));
+
+  return '<login><user status="' + user.user_status +
+         '" imversion="' + entities.encode(user.imversion, 0) +
+         '" localeid="2052" pc_hash="' + entities.encode(pc_hash, 0) + '" /></login>';
+}
+
+/**
+ * @constructor
+ * @param {User} user
+ * @extends {BaseCommand}
+ */
+function UserQueryCommand(user) {
+  BaseCommand.call(this, "user", "query", "1.14");
+
+  this._user = user;
+
+  this.addCommandHead("uid", user.imid);
+}
+base.inherits(UserQueryCommand, BaseCommand);
+
+UserQueryCommand.prototype.createCommandBody = function() {
+  return "<query fields=\"" + constant.QueryFields.USER_QUERY_FIELDS + "\" />";
+}
+
 
 
 
@@ -341,6 +385,8 @@ exports.BaseCommand = BaseCommand;
 exports.LoginCommand = LoginCommand;
 exports.VerifyCommand = VerifyCommand;
 exports.UserSetStatus = UserSetStatus;
+exports.LoginReadyCommand = LoginReadyCommand;
+exports.UserQueryCommand = UserQueryCommand;
 
 
 /* vim: set ts=4 sw=4 sts=4 tw=100: */

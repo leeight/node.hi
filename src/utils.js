@@ -70,6 +70,24 @@ exports.indexOf = function(a, b) {
   return -1;
 }
 
+/**
+ * 自己想办法生成一个.
+ * @param {string} hexMd5 32个字节长度.
+ */
+exports.getSoftwareUUID = function(hexMd5) {
+  var buffer = ['HI'];
+  buffer.push(hexMd5.substr(0, 16));
+
+  var start = parseInt(hexMd5[2], 16);
+  for(var i = 0; i < 4; i ++) {
+    var index = (start + i * 8 + 1) % hexMd5.length;
+    buffer.push(hexMd5[index]);
+  }
+  buffer.push(hexMd5.substr(16, 16));
+
+  return buffer.join('').toUpperCase();
+}
+
 
 
 

@@ -58,6 +58,27 @@ exports.testUserSetStatus = function(test) {
   test.done();
 }
 
+exports.testLoginReadyCommand = function(test) {
+  var user = {
+    imid: 8964,
+    imversion: '1,0,0,0',
+    user_status: 1,
+    account: 'hello world.'
+  };
+  var lrcc = new command.LoginReadyCommand(user);
+  test.equal(lrcc.createCommand(), 'user 2.0 R 5\nmethod:login_ready\ncontent-length:119\ncontent-type:text\nuid:8964\n\r\n<login><user status=\"1\" imversion=\"1,0,0,0\" localeid=\"2052\" pc_hash=\"HI3C4292AE95BE58E028E6C58E4E5511F09647\" /></login>');
+  test.done();
+}
+
+exports.testUserQueryCommand = function(test) {
+  var user = {
+    imid: 8964
+  }
+  var uqcc = new command.UserQueryCommand(user);
+  test.equal(uqcc.createCommand(), 'user 1.14 R 6\nmethod:query\ncontent-length:87\ncontent-type:text\nuid:8964\n\r\n<query fields=\"baiduid;personal_comment;birthday;email;head;name;nickname;phone;sex\" />');
+  test.done();
+}
+
 
 
 

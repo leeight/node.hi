@@ -44,13 +44,55 @@ function Client() {
    */
   this.socket;
 
+  /**
+   * @type {int}
+   */
+  this.status;
+
   this.on('finish_handshake', this._onFinishHandShake.bind(this));
   this.on('login_success', this._onLoginSuccess.bind(this));
+  this.on('login_ready', this._onLoginReady.bind(this));
+  this.on('user_query', this._onUserQuery.bind(this));
 }
 base.inherits(Client, events.EventEmitter);
 
 Client.prototype.getUser = function() {
   return this.user;
+}
+
+Client.prototype.getStatus = function() {
+  return this.status;
+}
+
+Client.prototype.setStatus = function(status) {
+  this.status = status;
+}
+
+/**
+ * @param {response.UserQueryReponse} response 服务器返回的结果.
+ */
+Client.prototype._onUserQuery = function(response) {
+  var user = response.getUser();
+  if (user) {
+    for (var key in user) {
+      if (user.hasOwnProperty(key)) {
+        this.user[key] = user[key];
+        logger.info('user.' + key + ' = [' + user[key] + ']');
+      }
+    }
+  }
+}
+
+/**
+ * finish_handshake
+ *   -> login_success
+ *        -> login_ready
+ */
+Client.prototype._onLoginReady = function() {
+  // 通知其它客户端掉线
+  this.nm.sendMessage(new command.LoginReadyCommand(this.user));
+  // 查询用户的信息
+  this.nm.sendMessage(new command.UserQueryCommand(this.user));
 }
 
 /**

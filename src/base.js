@@ -20,10 +20,12 @@ exports.inherits = function (d, b) {
 };
 
 exports.mixin = function(target, source) {
-  for(var p in source) {
-    if (source.hasOwnProperty(p)) {
-      if (typeof target[p] === 'undefined') {
-        target[p] = source[p];
+  if (source) {
+    for(var p in source) {
+      if (source.hasOwnProperty(p)) {
+        if (typeof target[p] === 'undefined') {
+          target[p] = source[p];
+        }
       }
     }
   }

@@ -341,7 +341,7 @@ PacketHead.prototype.getBytes = function() {
   // 4: nReserved2
 
   // PacketHead Size is 40 bytes.
-  var bytes = new Buffer(ProtocolConstant.PAKECT_HEAD_LENGTH);
+  var bytes = new Buffer(ProtocolConstant.PACKET_HEAD_LENGTH);
   bytes.fill(0);
   bytes.write(this.nVer, 0, Buffer.byteLength(this.nVer));
   bytes.write(this.nTag, 4, Buffer.byteLength(this.nTag));
@@ -456,10 +456,9 @@ base.addSingletonGetter(PacketFactory);
 /**
  * @type {PacketHead} head
  * @type {Buffer} bytes
+ * @type {function(Packet)} callback
  */
-PacketFactory.prototype.create = function(head, bytes) {
-  var packet;
-
+PacketFactory.prototype.create = function(head, bytes, callback) {
   switch(head.ctFlag) {
     case ECtFlagConnectStates.CT_FLAG_CON_S2: {
       // Modifying the new buffer slice will modify memory in the original buffer!
@@ -469,7 +468,7 @@ PacketFactory.prototype.create = function(head, bytes) {
       var hb = new HandshakeBody();
       hb.keyData = bytes.slice(18, 18 + s2Data.nDataLen);
 
-      packet = new Packet(head, s2Data, hb);
+      callback(new Packet(head, s2Data, hb));
       break;
     }
 
@@ -487,11 +486,10 @@ PacketFactory.prototype.create = function(head, bytes) {
       var xml = bytes.slice(start, end);
 
       packet.message = new Message();
+      // <ts_config><heartbeat sign_interval="300" echo_timeout="600"/></ts_config>
       packet.message.message = xml.toString('ascii');
 
-      // <ts_config><heartbeat sign_interval="300" echo_timeout="600"/></ts_config>
-      // 历史性的一刻, 终于收到一条能看懂的消息了.
-
+      callback(packet);
       break;
     }
 
@@ -509,14 +507,18 @@ PacketFactory.prototype.create = function(head, bytes) {
         break;
       }
 
-      var decompressData = security.decompressData(decryptedData, head.nSrcDataLen);
-      if (!decompressData) {
-        logger.error('invalid CT_FLAG_CON_OK packet, decompress failed!');
-      }
+      security.decompressData(decryptedData, head.nSrcDataLen, function(err, decompressData){
+        if (err) {
+          logger.error('invalid CT_FLAG_CON_OK packet, decompress failed!');
+          logger.error(err);
+          return;
+        }
 
-      packet = new Packet();
-      packet.packetHead = head;
-      packet.message = new Message(decompressData);
+        var packet = new Packet();
+        packet.packetHead = head;
+        packet.message = new Message(decompressData);
+        callback(packet);
+      });
       break;
     }
 
@@ -535,9 +537,10 @@ PacketFactory.prototype.create = function(head, bytes) {
       }
       logger.debug(decryptedData.toString('ascii'));
 
-      packet = new Packet();
+      var packet = new Packet();
       packet.packetHead = head;
       packet.message = new Message(decryptedData);
+      callback(packet);
       break;
     }
 
@@ -550,8 +553,6 @@ PacketFactory.prototype.create = function(head, bytes) {
       logger.error('Invalid ctFlag = [' + head.ctFlag + ']');
       break;
   }
-
-  return packet;
 }
 
 exports.HandshakeHead = HandshakeHead;
