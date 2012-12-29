@@ -153,7 +153,6 @@ Login.prototype._onLogin = function(response, nm) {
 
 Login.prototype._onVerify = function(response, nm) {
   logger.debug('Login.prototype._onVerify');
-  logger.debug(response);
 
   var seq = response.seq;
   var cmd = nm.findCommand(seq);

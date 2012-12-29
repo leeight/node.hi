@@ -79,6 +79,12 @@ exports.testUserQueryCommand = function(test) {
   test.done();
 }
 
+exports.testMsgAckCommand = function(test) {
+  var mac = new command.MsgAckCommand(1, 89, 64, '11223344', 9999);
+  test.equal(mac.createCommand(), "msg 1.1 R 7\nmethod:msg_ack\ncontent-length:34\ncontent-type:text\ntype:1\nuid:9999\nfrom:64\nto:89\n\r\n<acks><ack id=\"11223344\" /></acks>");
+  test.done();
+}
+
 
 
 

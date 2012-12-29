@@ -77,8 +77,8 @@ exports.testMixin = function(test) {
     command: '',
   }, rv);
 
-  test.equal(rv.code, 300);
-  test.equal(rv.command, "");
+  test.equal(rv.code, 200);
+  test.equal(rv.command, "verify");
   test.equal(rv.superCommand, "security");
   test.equal(rv.version, "1.0");
   test.equal(rv.type, "A");
@@ -124,6 +124,37 @@ exports.testUserQueryReponse = function(test) {
   test.equal(user.nickname, '');
   test.equal(user.phone, '');
   test.equal(user.sex, 1);
+  test.done();
+}
+
+exports.testMsgNotifyResponse = function(test) {
+  var bytes = new Buffer(
+    "msg 1.2 N 558\r\n" +
+    "addon:status=2\r\n" +
+    "basemsgid:3836574952\r\n" +
+    "content-length:153\r\n" +
+    "content-type:text\r\n" +
+    "from:8964\r\n" +
+    "from_sub:0\r\n" +
+    "method:msg_notify\r\n" +
+    "msgid:29\r\n" +
+    "subid:0\r\n" +
+    "sys_sess:00340100abcd010050dea5b10101d3ff000000000a1a34153e80000050de61290000000000000000000000000000000000000000\r\n" +
+    "time:1356768688979\r\n" +
+    "to:114960740\r\n" +
+    "type:1\r\n" +
+    "uid:16897023\r\n" +
+    "waitack:120\r\n", "utf-8");
+
+  var father = response.BaseResponse.createResponse(bytes);
+  var mnr = new response.MsgNotifyResponse(father);
+  test.equal(mnr.msg_type, 1);
+  test.equal(mnr.from_id, 8964);
+  test.equal(mnr.to_id, 114960740);
+  test.equal(mnr.base_msg_id, 3836574952);
+  test.equal(mnr.time, 1356768688979);
+  test.equal(mnr.uid, 16897023);
+  test.equal(mnr.wait_ack, 120);
   test.done();
 }
 

@@ -23,9 +23,9 @@ exports.mixin = function(target, source) {
   if (source) {
     for(var p in source) {
       if (source.hasOwnProperty(p)) {
-        if (typeof target[p] === 'undefined') {
+        // if (typeof target[p] === 'undefined') {
           target[p] = source[p];
-        }
+        // }
       }
     }
   }

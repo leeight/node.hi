@@ -14,6 +14,8 @@
  * @description 
  *  
  **/
+var logger = require('./logger').logger;
+
 /**
  * @type {Buffer} a
  * @type {Buffer} b
@@ -86,6 +88,90 @@ exports.getSoftwareUUID = function(hexMd5) {
   buffer.push(hexMd5.substr(16, 16));
 
   return buffer.join('').toUpperCase();
+}
+
+/**
+ * XML格式的消息转化称普通的文本格式
+ * <msg>
+ *  <font n="宋体" s="10" b="0" i="0" ul="0" c="0" cs="134" />
+ *  <text c="asdfasdf" />
+ *  <face id="d58" n="猪头" />
+ *  <text c="fasdfasdf" />
+ *  <url c="http://www.baidu.com" />
+ *  <cface />
+ *  <reply />
+ *  <img md5="" t="" >
+ *    <thumb thumbdata="" />
+ *  </img>
+ * </msg>
+ */
+exports.xml2text = function(xml) {
+  if (!xml) {
+    logger.error('xml2text failed, xml = [' + xml + ']');
+    return null;
+  }
+
+  var DOMParser = require('xmldom').DOMParser;
+  var doc = new DOMParser().parseFromString(xml.replace(/\u0000/g, ''));
+  var root = doc.documentElement;
+
+  var msg = [];
+  for(var i = 0, j = root.childNodes.length; i < j; i ++) {
+    var node = root.childNodes[i];
+    if (node.nodeType === 1) {
+      switch(node.nodeName.toUpperCase()) {
+        case 'TEXT': {
+          msg.push(node.getAttribute('c'));
+          break;
+        }
+        case 'FACE': {
+          msg.push('[' + node.getAttribute('n') + ']');
+          break;
+        }
+        case 'REPLY': {
+          var type = parseInt(node.getAttribute('t')) || 0;
+          if (type === 2) {
+            msg.push('『引用:');
+            msg.push(node.getAttribute('c'));
+            msg.push('』');
+          } else {
+            var name = node.getAttribute('n') || '--';
+            msg.push('『回复:');
+            msg.push(name + ';');
+            msg.push(node.getAttribute('c'));
+            msg.push('』');
+          }
+          break;
+        }
+        case 'IMG': {
+          var md5 = node.getAttribute('md5');
+          var type = node.getAttribute('t');
+          if (node.childNodes.length) {
+            var child = node.childNodes[0];
+            var nodeName = child.nodeName.toUpperCase();
+            if (nodeName === 'THUMB') {
+              // TODO(leeight) 存储缩略图 node.getAttribute('thumbdata');
+              msg.push('『图片:' + md5 + '.' + type + '』');
+            } else if (nodeName === 'IMAGE') {
+              // TODO(leeight) 存储图片 node.getAttribute('imagedata');
+              msg.push('『图片:' + md5 + '.' + type + '』');
+            }
+          }
+          break;
+        }
+        case 'CFACE': {
+          msg.push('[表情]');
+          break;
+        }
+        case 'URL': {
+          msg.push(' ' + node.getAttribute('c') + ' ');
+          break;
+        }
+      }
+    }
+  }
+
+  return msg.join('');
 }
 
 

@@ -138,6 +138,59 @@ exports.testGetSoftwareUUID = function(test) {
   test.done();
 }
 
+exports.testXml2Text = function(test) {
+  var xml = [
+    '<msg>',
+      '<font n="宋体" s="10" b="0" i="0" ul="0" c="0" cs="134" />',
+      '<text c="asdfasdf" />',
+      '<face id="d58" n="猪头" />',
+      '<text c="fasdfasdf" />',
+      '<url c="http://www.baidu.com" />',
+    '</msg>'
+  ].join('');
+
+  var DOMParser = require('xmldom').DOMParser;
+  var doc = new DOMParser().parseFromString(xml);
+  var root = doc.documentElement;
+  test.equal(root.childNodes.length, 5);
+  test.equal(root.childNodes[0].nodeName, 'font');
+  test.equal(root.childNodes[0].nodeType, 1);
+  test.equal(root.childNodes[1].nodeName, 'text');
+  test.equal(root.childNodes[2].nodeName, 'face');
+  test.equal(root.childNodes[3].nodeName, 'text');
+  test.equal(root.childNodes[4].nodeName, 'url');
+  test.done();
+}
+
+exports.testXml2Text2 = function(test) {
+  var xml = [
+    '<msg>',
+      '<font n="宋体" s="10" b="0" i="0" ul="0" c="0" cs="134" />',
+      '<text c="asdfasdf" />',
+      '<face id="d58" n="猪头" />',
+      '<text c="fasdfasdf" />',
+      '<url c="http://www.baidu.com" />',
+      '<cface />',
+      '<reply t="1" c="这里是回复的内容"/>',
+      '<img md5="md5sum" t="gif"><thumb thumbdata="base64data" /></img>',
+    '</msg>'
+  ].join(' ');
+
+  var text = utils.xml2text(xml);
+
+  var expected = 'asdfasdf' + '[猪头]' +
+    'fasdfasdf' +
+    ' http://www.baidu.com ' +
+    '[表情]' +
+    '『回复:--;这里是回复的内容』' +
+    '『图片:md5sum.gif』';
+
+  test.equal(text, expected);
+  test.done();
+}
+
+
+
 
 
 

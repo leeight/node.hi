@@ -366,6 +366,28 @@ UserQueryCommand.prototype.createCommandBody = function() {
 }
 
 
+/**
+ * @param {int} msg_type
+ * @param {int} to_id
+ * @param {int} from_id
+ * @param {string} time
+ * @param {int} imid
+ */
+function MsgAckCommand(msg_type, to_id, from_id, time, imid) {
+  BaseCommand.call(this, "msg", "msg_ack", "1.1");
+
+  this.time = time;
+
+  this.addCommandHead('type', String(msg_type));
+  this.addCommandHead('uid', String(imid));
+  this.addCommandHead('from', String(from_id));
+  this.addCommandHead('to', String(to_id));
+}
+base.inherits(MsgAckCommand, BaseCommand);
+
+MsgAckCommand.prototype.createCommandBody = function() {
+  return '<acks><ack id="' + this.time + '" /></acks>';
+}
 
 
 
@@ -387,6 +409,7 @@ exports.VerifyCommand = VerifyCommand;
 exports.UserSetStatus = UserSetStatus;
 exports.LoginReadyCommand = LoginReadyCommand;
 exports.UserQueryCommand = UserQueryCommand;
+exports.MsgAckCommand = MsgAckCommand;
 
 
 /* vim: set ts=4 sw=4 sts=4 tw=100: */

@@ -21,6 +21,7 @@ var lnet = require('./lnet');
 var logger = require('./logger').logger;
 var user = require('./user');
 var base = require('./base');
+var utils = require('./utils');
 var events = require('events');
 
 /**
@@ -53,6 +54,7 @@ function Client() {
   this.on('login_success', this._onLoginSuccess.bind(this));
   this.on('login_ready', this._onLoginReady.bind(this));
   this.on('user_query', this._onUserQuery.bind(this));
+  this.on('new_message', this._onNewMessage.bind(this));
 }
 base.inherits(Client, events.EventEmitter);
 
@@ -66,6 +68,16 @@ Client.prototype.getStatus = function() {
 
 Client.prototype.setStatus = function(status) {
   this.status = status;
+}
+
+/**
+ * @param {response.MsgNotifyResponse} response 新的消息.
+ */
+Client.prototype._onNewMessage = function(response) {
+  logger.debug('Client.prototype._onNewMessage');
+
+  var text = utils.xml2text(response.xml);
+  logger.info(text);
 }
 
 /**

@@ -15,10 +15,12 @@
  *  
  **/
 var login = require('./login');
+var notification = require('./notification');
 
 exports.all = function() {
   return [
-    new login.Login()
+    new login.Login(),
+    new notification.Notification()
   ];
 }
 

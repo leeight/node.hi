@@ -171,6 +171,7 @@ NetManager.prototype._registerMessageHandlers = function() {
   this._messageHandlers['contact_notify'] = 'ContactNotifyResponse';
   this._messageHandlers['contact_query'] = 'ContactQueryResponse';
   this._messageHandlers['timestamp_user'] = 'TimestampResponse';
+  this._messageHandlers['msg_msg_notify'] = 'MsgNotifyResponse';
   // TODO...
 
   this._receivers = logic.all();
@@ -201,7 +202,6 @@ NetManager.prototype.dispatchMessage = function(msg) {
     var ctor = response[klassName];
     if (ctor) {
       var instance = new ctor(res);
-      logger.debug(instance);
 
       // dispatch instance to receivers
       var me = this;
@@ -311,10 +311,7 @@ NetManager.prototype.send = function(packet) {
         head.nSrcDataLen = msgBytes.length;
         head.nZipDataLen = zipBytes.length;
         head.nDestDataLen = aesBytes.length;
-        // logger.debug(head.getBytes());
-        // logger.debug(aesBytes);
         var data = utils.sumArray(head.getBytes(), aesBytes);
-        logger.debug(data);
         me.socket.write(data);
       });
     }
@@ -325,8 +322,7 @@ NetManager.prototype.send = function(packet) {
  * @param {BaseCommand} command
  */
 NetManager.prototype.sendMessage = function(command) {
-  logger.debug('NetManager.prototype.sendMessage, login command seq = [' + command.seq + ']');
-  logger.debug(command);
+  logger.debug('NetManager.prototype.sendMessage');
 
   var packet = new protocol.Packet();
   packet.packetHead = protocol.PacketHead.MESSAGE;
@@ -370,8 +366,6 @@ NetManager.prototype.decode = function() {
       break;
   }
 
-  logger.debug(head);
-
   if (bufferSize < (length + packetHeadLength)) {
     logger.error('bufferSize = [' + bufferSize + '], length = [' + length +
       '], packetHeadLength = [' + packetHeadLength + ']')
@@ -384,7 +378,6 @@ NetManager.prototype.decode = function() {
     if (!packet) {
       logger.error('invalid packet :-(');
     } else {
-      logger.debug(packet);
       me._bytes = me._bytes.slice(length + packetHeadLength);
       me.emit('new_packet', packet);
     }

@@ -535,7 +535,7 @@ PacketFactory.prototype.create = function(head, bytes, callback) {
         logger.error('invalid CT_FLAG_CON_OK_NOZIP_NOAES packet, decrypt failed!');
         break;
       }
-      logger.debug(decryptedData.toString('ascii'));
+      logger.debug(JSON.stringify(decryptedData.toString('ascii')));
 
       var packet = new Packet();
       packet.packetHead = head;

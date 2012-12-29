@@ -103,6 +103,15 @@ exports.QueryFields = {
   GROUP_QUERY_FIELDS: "name;online;total",
 };
 
+exports.MessageChat = {
+  CHAT_TYPE_UNKNOWNCHAT: 0,           // 未知聊天类型，用0表示
+  CHAT_TYPE_DOUBLECHAT: 1,            // 双人聊天(单人聊天)
+  CHAT_TYPE_GROUPCHAT: 2,             // 群聊天
+  CHAT_TYPE_MULTICHAT: 3,             // 多人聊天
+  CHAT_TYPE_TEMPCHAT: 4,              // 临时会话，不会在msg的type中出现
+  CHAT_TYPE_TEMPCHATINGROUP: 5        // 来自群的临时会话，不会在msg的type中出现
+}
+
 // User Statuses
 exports.USER_STATUS_ONLINE = 1;
 exports.USER_STATUS_BUSY = 2;

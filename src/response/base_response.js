@@ -169,7 +169,6 @@ BaseResponse.createResponse = function(bytes) {
   logger.debug('response.xml = [' + JSON.stringify(response.xml) + ']');
 
   var lines = header.split(/\r?\n/g);
-  console.log(lines);
   if (!lines.length) {
     logger.error('invalid header');
     return;
