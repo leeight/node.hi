@@ -5,7 +5,8 @@
     "socket.io": "0.9.13",
     "express": "3.0.5",
     "jade": "0.27.6",
-    "less": "stable"
+    "less": "stable",
+    "moment": "1.7.2"
   },
   "description": "Baidu Hi Client On Node.JS",
   "homepage": "http://git.jumbo.ws/chrome-apps/chrome-apps",
