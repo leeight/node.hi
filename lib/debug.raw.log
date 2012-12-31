@@ -284,3 +284,12 @@ TypeError: Cannot read property 'length' of undefined
 "<msg><font n=\"宋体\" s=\"10\" b=\"0\" i=\"0\" ul=\"0\" c=\"0\" cs=\"134\"/><reply t=\"2\" c=\"http://www.google.com \" n=\"\"/><text c=\"\r\n你好\"/></msg>\u0000"
 
 header = ["msg 1.2 N 442\r\naddon:status=5\r\nbasemsgid:3935677034\r\ncontent-length:161\r\ncontent-type:text\r\nfrom:16897023\r\nfrom_sub:0\r\nmethod:msg_notify\r\nmsgid:5\r\nnextsubid:0\r\nsubid:0\r\nsys_sess:00340100abcd010050dfe54d0101d3ff000000000a4112453e80000050dfdc410000000000000000000000000000000000000000\r\ntime:1356850508600\r\nto:114960740\r\ntype:1\r\nuid:16897023\r\nwaitack:120"]
+
+msg 1.1 R 7\nmethod:msg_ack\ncontent-length:34\ncontent-type:text\ntype:1\nuid:9999\nfrom:89\nto:64\n\r\n<acks><ack id="11223344" /></acks>
+msg 1.1 R 7\nmethod:msg_ack\ncontent-length:34\ncontent-type:text\ntype:1\nuid:9999\nfrom:64\nto:89\n\r\n<acks><ack id="11223344" /></acks>
+
+
+
+"cm 1.0 R 564\r\nfrom:16897023\r\nmethod:blk\r\nsub_id:0\r\nsys_sess:00340100abcd010050e194bf0101d3ff000000000a1a35173e80000050e13f710000000000000000000000000000000000000000\r\nto:114960740\r\ntype:1\r\nuid:16897023\r\n"
+
+"cm 1.0 R 565\r\nfrom:16897023\r\nmethod:blk\r\nsub_id:0\r\nsys_sess:00340100abcd010050e194eb0101d3ff000000000a1a35173e80000050e13f710000000000000000000000000000000000000000\r\nto:114960740\r\ntype:1\r\nuid:16897023\r\n"

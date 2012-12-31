@@ -6,7 +6,8 @@
     "ursa": "0.8.0",
     "nodeunit": "0.7.4",
     "xmldom": "0.1.13",
-    "entities": "0.1.1"
+    "entities": "0.1.1",
+    "sqlite": "1.0.4"
   },
   "description": "Baidu Hi Client On Node.JS",
   "homepage": "http://git.jumbo.ws/chrome-apps/chrome-apps",
