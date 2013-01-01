@@ -27,6 +27,7 @@ function getTime(opt_time) {
 }
 
 io.sockets.on('connection', function (socket) {
+  /*
   socket.emit('new_message', {
     'content': 'welcome',
     'time': getTime()
@@ -42,7 +43,7 @@ io.sockets.on('connection', function (socket) {
       'time': getTime()
     });
   }, 1000);
-  /*
+  */
   client.on('login_success', function(){
     socket.emit('new_message', {
       "source_type": "incoming",
@@ -59,7 +60,6 @@ io.sockets.on('connection', function (socket) {
     });
   });
   client.start();
-  */
 });
 
 

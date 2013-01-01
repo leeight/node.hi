@@ -440,3 +440,10 @@ Server -> Client
 000000a0: 6cc1 985f 596b 3204 ebba 3bbb 70e7 5fd5  l��_Yk2.��;�p�_�
 000000b0: a757 e1f0 16f8 7ede 8483 da79 3d98 47f0  �W��.�~ބ��y=�G�
 000000c0: 3aa1 16d0 90aa 168e 39ca 604f 8306 059f  :�.А�.�9�`O�..�
+
+
+
+[2013-01-01 15:49:45.887] [DEBUG] [default] - header = ["msg 1.2 N 1186\r\ncontent-length:39\r\ncontent-type:text\r\nfrom:16897023\r\nfrom_sub:0\r\nmethod:msg_ack_notify\r\nsys_sess:00340100abcd020050e295150101d3ff000000000a410cd23e80000050e294b606da2964000000000a2e6e343e80000050e294cf\r\nto:114960740\r\nto_sub:0\r\ntype:1"]
+[2013-01-01 15:49:45.887] [DEBUG] [default] - response.xml = ["<acks><ack id=\"1357026576426\"/></acks>\u0000"]
+[2013-01-01 15:49:45.887] [DEBUG] [default] - protocolType = [msg_msg_ack_notify]
+[2013-01-01 15:49:45.887] [WARN] [default] - NetManager._messageHandlers[msg_msg_ack_notify] is undefined.
