@@ -3,3 +3,4 @@ themes
 erlang-baidu
 hipro
 hi.log
+*.sqlite

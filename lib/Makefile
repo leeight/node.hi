@@ -4,6 +4,7 @@ test:
 	node_modules/nodeunit/bin/nodeunit test_command.js
 	node_modules/nodeunit/bin/nodeunit test_protocol.js
 	node_modules/nodeunit/bin/nodeunit test_packet.js
+	# node_modules/nodeunit/bin/nodeunit test_sqlite.js
 
 stat:
 	wc -l `find . -path "*node_modules*" -prune -o -type f -name "*.js" -print`
