@@ -7,7 +7,8 @@
     "nodeunit": "0.7.4",
     "xmldom": "0.1.13",
     "entities": "0.1.1",
-    "sqlite": "1.0.4"
+    "sqlite": "1.0.4",
+    "hexy": "0.2.5"
   },
   "description": "Baidu Hi Client On Node.JS",
   "homepage": "http://git.jumbo.ws/chrome-apps/chrome-apps",
