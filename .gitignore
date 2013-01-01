@@ -4,3 +4,4 @@ erlang-baidu
 hipro
 hi.log
 *.sqlite
+*.sqlite-journal
