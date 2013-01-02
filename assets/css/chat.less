@@ -16,6 +16,29 @@
  **/
 @import-once "bootstrap/mixins.less";
 
+.main {
+  .gain-bfc();
+}
+
+.threads,
+.sent {
+  float: left;
+}
+
+.sent {
+  width: 300px;
+  textarea {
+    font-family: arial, sans-serif;
+    width: 100%;
+    height: 50px;
+    border: 1px solid #ccc;
+    outline: none;
+    &:focus {
+      border-color: blue;
+    }
+  }
+}
+
 
 
 

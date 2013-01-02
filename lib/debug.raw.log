@@ -447,3 +447,14 @@ Server -> Client
 [2013-01-01 15:49:45.887] [DEBUG] [default] - response.xml = ["<acks><ack id=\"1357026576426\"/></acks>\u0000"]
 [2013-01-01 15:49:45.887] [DEBUG] [default] - protocolType = [msg_msg_ack_notify]
 [2013-01-01 15:49:45.887] [WARN] [default] - NetManager._messageHandlers[msg_msg_ack_notify] is undefined.
+
+
+"friend 2.10 A 6\r\nmethod:get_friend\r\ncode:200\r\ncontent-type:text\r\ncontent-length:283\r\n\r\n<friend_set>\n\t<friend imid=\"16897023\" team=\"0\" validated=\"1\" monicker=\"\" />\n\t<friend imid=\"32353201\" team=\"240\" validated=\"1\" monicker=\"\" />\n\t<friend imid=\"327616233\" team=\"0\" validated=\"1\" monicker=\"\" />\n\t<friend imid=\"346518627\" team=\"0\" validated=\"1\" monicker=\"\" />\n</friend_set>\n"
+[2013-01-01 20:34:07.700] [DEBUG] [default] - header = ["friend 2.10 A 6\r\nmethod:get_friend\r\ncode:200\r\ncontent-type:text\r\ncontent-length:283"]
+[2013-01-01 20:34:07.701] [DEBUG] [default] - response.xml = ["<friend_set>\n\t<friend imid=\"16897023\" team=\"0\" validated=\"1\" monicker=\"\" />\n\t<friend imid=\"32353201\" team=\"240\" validated=\"1\" monicker=\"\" />\n\t<friend imid=\"327616233\" team=\"0\" validated=\"1\" monicker=\"\" />\n\t<friend imid=\"346518627\" team=\"0\" validated=\"1\" monicker=\"\" />\n</friend_set>\n"]
+
+[2013-01-02 11:51:13.781] [DEBUG] [default] - header = ["contact 3.15 A 7\r\ncode:200\r\ncontent-length:1151\r\ncontent-type:text\r\nmethod:query"]
+[2013-01-02 11:51:13.781] [DEBUG] [default] - response.xml = ["<contact_set>\n    <contact imid=\"32353201\" baiduid=\"yaoasm\" personal_comment=\"\" nickname=\"\" head=\"\" name=\"\" birthday=\"1980-2-24\" personal_desc=\"\" sex=\"2\" cli_type=\"0\" email=\"yaoasm1@126.com\" status=\"5\" email_fixed=\"1\" timestamp=\"1\" />\n    <contact imid=\"346518627\" baiduid=\"wangminsy001\" personal_comment=\"F5-B187 6058-0425  ;;wangmin02@baidu.com;;求UE\" nickname=\"王敏\" head=\"1e82e5a0e0bd1081cf2b5a99e9b1cd93;20120822100544;png\" name=\"\" birthday=\"0-0-0\" personal_desc=\"\" sex=\"2\" cli_type=\"0\" email=\"wangm1800@163.com\" status=\"5\" email_fixed=\"1\" timestamp=\"73\" />\n    <contact imid=\"16897023\" baiduid=\"leeight\" personal_comment=\"\" nickname=\"\" head=\"691e568b132ffddfc478d619cc397e16;20121106180725;gif\" name=\"李玉北\" birthday=\"2008-3-31\" personal_desc=\"\" sex=\"1\" cli_type=\"0\" email=\"liyubei@baidu.com\" status=\"5\" email_fixed=\"1\" timestamp=\"191\" />\n    <contact imid=\"327616233\" baiduid=\"panjun0108\" personal_comment=\"已离职 msn: panjun108@gmail.com\" nickname=\"潘军\" head=\"\" name=\"\" birthday=\"0-0-0\" personal_desc=\"\" sex=\"1\" cli_type=\"0\" email=\"panjun@baidu.com\" status=\"5\" email_fixed=\"1\" timestamp=\"23\" />\n</contact_set>\n"]
+
+
+C32292865B15D051A847FA9F35D6091B

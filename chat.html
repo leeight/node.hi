@@ -7,19 +7,23 @@
     <link rel="stylesheet" type="text/css" href="assets/css/chat.css" />
   </head>
   <body>
-    <div class="threads"></div>
-
+    <div class="main">
+      <div class="threads"></div>
+      <div class="sent">
+        <textarea></textarea>
+      </div>
+    </div>
 <textarea id="TPL-new-message" style="display:none">
 div(class="message #{source_type}")
   div.avatar
     img(src="assets/images/dummy_contact.png", width="32px", height="32px")
   div.indicator
   div.content
-    div.bd #{content}
+    div.bd !{content}
       time #{time}
 </textarea>
 <textarea id="TPL-message-bd" style="display:none">
-div.bd #{content}
+div.bd !{content}
   time #{time}
 </textarea>
   </body>

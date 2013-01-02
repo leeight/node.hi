@@ -31,6 +31,11 @@ $(function(){
     }
     window.scrollTo(0, 100000);
   });
+
+  $(".sent textarea").on('input', function(){
+    var rows = $(this).val().split(/\r?\n/g);
+    $(this).css('height', Math.max(rows.length, 3) * 16);
+  });
 });
 
 
