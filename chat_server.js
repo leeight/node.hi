@@ -27,28 +27,15 @@ function getTime(opt_time) {
 }
 
 io.sockets.on('connection', function (socket) {
-  /*
-  socket.emit('new_message', {
-    'content': 'welcome',
-    'time': getTime()
+  socket.on('send_message', function(msg){
+    client.sendMessage(msg.to_id, msg.text);
   });
-  socket.emit('new_message', {
-    'content': 'welcome',
-    'time': getTime()
-  });
-  setInterval(function(){
-    socket.emit('new_message', {
-      'source_type': (Math.random() > 0.5 ? 'incoming' : 'outcoming'),
-      'content': 'welcome',
-      'time': getTime()
-    });
-  }, 1000);
-  */
   client.on('login_success', function(){
     socket.emit('new_message', {
       "source_type": "incoming",
       "content": "登陆成功, imid = [" + this.user.imid + "]",
-      "time": "3分钟前"
+      "from_id": 0,
+      "time": getTime()
     });
   });
   client.on('new_message', function(response){
@@ -56,6 +43,7 @@ io.sockets.on('connection', function (socket) {
     socket.emit('new_message', {
       "source_type": "incoming",
       "content": text,
+      "from_id": response.from_id,
       "time": getTime(response.time)
     });
   });
