@@ -7,3 +7,4 @@ hi.log
 *.sqlite-journal
 data/images
 lib/data/images
+pcs-php
