@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "minimum_chrome_version": "23",
+  "name": "Baidu Hi",
+  "description": "Baidu Hi on Node.JS",
+  "version": "0.1",
+  "app": {
+    "background": {
+      "scripts": [
+        "background.js"
+      ]
+    }
+  },
+  "icons": {
+    "16": "assets/images/16x16.gif",
+    "32": "assets/images/64x64.jpg",
+    "128": "assets/images/128x128.png"
+  },
+  "permissions": [
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "fileSystem"
+  ]
+}

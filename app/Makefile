@@ -6,10 +6,10 @@ CSS  = $(LESS:.less=.css)
 all: $(HTML) $(CSS)
 
 %.html: %.jade
-		node_modules/jade/bin/jade < $< --path $< > $@
+		../node_modules/jade/bin/jade < $< --path $< > $@
 
 %.css: %.less
-		node_modules/less/bin/lessc --yui-compress --include-path=assets/less $< $@
+		../node_modules/less/bin/lessc --yui-compress --include-path=assets/less $< $@
 clean:
 		rm -f $(HTML) $(CSS)
 

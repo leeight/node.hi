@@ -1,0 +1,105 @@
+/***************************************************************************
+ * 
+ * Copyright (c) 2013 Baidu.com, Inc. All Rights Reserved
+ * $Id$ 
+ * 
+ **************************************************************************/
+ 
+ 
+ 
+/**
+ * assets/css/login.less ~ 2013/01/06 15:55:05
+ * @author leeight(liyubei@baidu.com)
+ * @version $Revision$ 
+ * @description 
+ *  
+ **/
+@import-once "bootstrap/mixins.less";
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.form-horizontal {
+  padding: 0 20px;
+}
+
+.contacts {
+  ul, li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .personal-comment  {
+    color: gray;
+  }
+
+  li {
+    display: block;
+    padding: 3px 0 3px 10px;
+    overflow: hidden;
+    zoom: 1;
+
+    &:hover {
+      background-color: #c3d9ff;
+      cursor: pointer;
+    }
+  }
+
+  .icon {
+    display: inline-block;
+    font-size: 1px;
+    height: 12px;
+    line-height: 1px;
+    width: 12px;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    margin-top: 6px;
+    border: none;
+    background: url(../images/webim.gif) no-repeat;
+    float: left;
+  }
+
+  // 在线
+  .status-1 {
+    background-position:0 -411px;
+  }
+
+  // 忙碌
+  .status-2 {
+    background-position:0 -439px;
+  }
+
+  // 离开
+  .status-3 {
+    background-position:0 -425px;
+  }
+
+  // 隐身 | 离线
+  .status-4,
+  .status-5 {
+    background-position:0 -453px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* vim: set ts=4 sw=4 sts=4 tw=100: */
