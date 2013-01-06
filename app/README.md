@@ -2,6 +2,10 @@
 
 [从这里提取的内容](http://developer.chrome.com/trunk/apps/first_app.html)
 
+### 启动 Chat Server
+
+    node chat_server.js
+
 ### Enable flags
 
 Many of the packaged apps APIs are still experimental, so you should enable experimental APIs so that you can try them out:
