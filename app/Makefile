@@ -10,6 +10,7 @@ all: $(HTML) $(CSS)
 
 %.css: %.less
 		../node_modules/less/bin/lessc --yui-compress --include-path=assets/less $< $@
+
 clean:
 		rm -f $(HTML) $(CSS)
 
