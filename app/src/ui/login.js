@@ -14,7 +14,7 @@
  * @description 
  *  
  **/
-require(['../friends'], function(FRIENDS){
+require(['../socket', '../friends'], function(socket, FRIENDS){
 $(function(){
   var IS_CONNECTED = false;
   var tpl_contact = $("#TPL-contact").val();
@@ -44,6 +44,7 @@ $(function(){
       html.push(Mustache.to_html(tpl_contact, friend));
     });
     $(".contacts ul").append(html.join(''));
+    $(".contacts ul li.empty").remove();
   }
 
   // 展示过滤之后的结果.
@@ -59,7 +60,7 @@ $(function(){
     friends.forEach(function(friend){
       html.push(Mustache.to_html(tpl_contact, friend));
     });
-    $(".contacts ul").append(html.join(''));
+    $(".contacts ul").html(html.join(''));
   }
 
   // 获取到新的消息.
@@ -67,7 +68,6 @@ $(function(){
     console.log(message);
   }
 
-  var socket = io.connect('http://localhost:8888');
   socket.on('connect', on_connect);
   socket.on('disconnect', on_relogin);
   socket.on('close', on_relogin);
@@ -106,25 +106,10 @@ $(function(){
       display_filter_result(FRIENDS.search(query));
     } else if (query.length <= 0) {
       // 重新展示所有的好友
+      $(".contacts ul").empty();
       on_friend_list(FRIENDS.getTopFriends());
     }
-    console.log(this);
   });
-
-  // --- DEBUG CODE ---
-(function(){
-  on_login_success();
-  var friends = [];
-  for(var i = 0; i < 100; i ++) {
-    friends.push({
-      imid: i,
-      status: [1,2,3,4,5][parseInt(Math.random() * 5, 10)],
-      baiduid: 'account' + i,
-      personal_comment: (Math.random() > 0.5) ? ('personal_comment' + i) : null,
-    });
-  }
-  on_friend_list(friends);
-})();
 });
 
 
