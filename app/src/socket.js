@@ -15,7 +15,13 @@
  *  
  **/
 define(function(){
-  return io.connect('http://localhost:8888');
+  var socket = io.connect('http://localhost:8888');
+
+  return {
+    get: function() {
+      return socket;
+    }
+  };
 });
 
 
