@@ -34,11 +34,22 @@
     </form>
 
     <!-- 联系人列表 -->
-    <div class="contacts" style="display:none">
-      <div class="filter">
-        <input type="search" placeholder="Search Contacts" />
+    <div class="main" style="display:none">
+      <div class="header">
+        <figure>
+          <img src="http://placekitten.com/36/36" width="36px" height="36px" alt="Avatar" />
+          <figcaption>
+            <div class="baiduid">Baidu Id</div>
+            <div class="personal-comment">Personal comment...</div>
+          </figcaption>
+        </figure>
       </div>
-      <ul></ul>
+      <div class="filter">
+        <input type="search" placeholder="Find a contact..." />
+      </div>
+      <div class="contacts">
+        <ul></ul>
+      </div>
     </div>
 
     <textarea id="TPL-contact" style="display:none">

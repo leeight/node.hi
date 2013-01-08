@@ -14,48 +14,51 @@
  * @description 
  *  
  **/
-$(function(){
-  var tpl_new_message = jade.compile($("#TPL-new-message").val())
-  var tpl_bd = jade.compile($("#TPL-message-bd").val());
-  var LAST_FROM_ID = 0;
+require(['../channel'], function(channel){
 
-  function htmlEncode(value){ 
-    if (value) {
-      return jQuery('<div/>').text(value).html(); 
-    } else {
-      return '';
-    }
+var tpl_new_message = $("#TPL-new-message").val();
+var tpl_bd = $("#TPL-message-bd").val();
+var last_from_id = document.location.search.replace(/\?imid=/, '');
+
+function htmlEncode(value){ 
+  if (value) {
+    return jQuery('<div/>').text(value).html(); 
+  } else {
+    return '';
   }
+}
 
-  var socket = io.connect('http://localhost:8888');
-  socket.on('connect', function (){
-    $(".threads").empty();
-  });
-  socket.on('new_message', function (message) {
-    LAST_FROM_ID = message.from_id;
-    if (!message.source_type) {
-      message.source_type = 'incoming';
-    }
-    var last = $(".threads .message:last-child");
-    if (last.hasClass(message.source_type)) {
-      last.data('from-id', message.from_id);
-      last.find('.content').append(tpl_bd(message));
-    } else {
-      $(".threads").append(tpl_new_message(message));
-    }
-  });
+// --- Server Events Handlers
+function on_connect() {
+  $(".threads").empty();
+}
 
-  $("#msg").on('input', function(){
-    var rows = $(this).val().split(/\r?\n/g);
-    $(this).css('height', Math.max(rows.length, 3) * 20);
-  });
+function on_new_message(message) {
+  last_from_id = message.from_id;
+  if (!message.source_type) {
+    message.source_type = 'incoming';
+  }
+  var last = $(".threads .message:last-child");
+  if (last.hasClass(message.source_type)) {
+    last.data('from-id', message.from_id);
+    last.find('.content').append(Mustache.to_html(tpl_bd, message));
+  } else {
+    $(".threads").append(Mustache.to_html(tpl_new_message, message));
+  }
+}
 
-  $("button[type=\"submit\"]").click(function(){
-    var msg = $("#msg").val().trim();
+// --- Server Events ---
+channel.on('connect', on_connect);
+channel.on('new_message', on_new_message);
+
+// --- UI Events ---
+$("#msg").on('keypress', function(e){
+  if (e.charCode === 13 && e.ctrlKey) {
+    var msg = $(this).val().trim();
     if (msg) {
-      if (LAST_FROM_ID) {
-        socket.emit('send_message', {
-          to_id: LAST_FROM_ID,
+      if (last_from_id) {
+        channel.emit('send_message', {
+          to_id: last_from_id,
           text: msg
         });
 
@@ -66,14 +69,16 @@ $(function(){
         };
         var last = $(".threads .message:last-child");
         if (last.hasClass("outcoming")) {
-          last.find('.content').append(tpl_bd(message));
+          last.find('.content').append(Mustache.to_html(tpl_bd, message));
         } else {
-          $(".threads").append(tpl_new_message(message));
+          $(".threads").append(Mustache.to_html(tpl_new_message, message));
         }
       }
+
+      $(this).val('');
+      return false;
     }
-    return false;
-  });
+  }
 });
 
 
@@ -94,5 +99,5 @@ $(function(){
 
 
 
-
+});
 /* vim: set ts=4 sw=4 sts=4 tw=100: */

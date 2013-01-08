@@ -2,88 +2,61 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Chat</title>
+    <title>Baidu Hi Chat</title>
+    <link rel="SHORTCUT ICON" href="http://www.baidu.com/favicon.ico">
     <link rel="stylesheet" text="text/css" href="assets/third_party/bootstrap/css/bootstrap.css" />
-    <link rel="stylesheet" text="text/css" href="assets/third_party/bootstrap/css/bootstrap-responsive.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/message_styles.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/chat.css" />
   </head>
   <body>
-    <div class="container navbar navbar-inverse">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="#">Baidu Hi</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active">
-                <a href="chat.html">Chat Demo</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="container">
       <div class="row-fluid">
         <div class="span12">
-          <div class="alert">
-            <ol>
-              <li>更改<code>chat_server.js</code>里面的配置, 主要是帐号和密码.
-              <li>启动chat_server.js, <code>node chat_server.js</code>
-              <li>访问<code>http://localhost/chat.html</code>
-              <li>功能还很简单, 出错请勿慌张.
-              <li>建议注册个<code>马甲</code>帐号来测试.
-            </ol>
+          <div class="header">
+            <figure>
+              <img src="http://placekitten.com/36/36" width="36px" height="36px" alt="Avatar" />
+              <figcaption>
+                <div class="baiduid">Baidu Id</div>
+                <div class="personal-comment">Personal comment...</div>
+              </figcaption>
+            </figure>
           </div>
-        </div>
-      </div>
-      <div class="row-fluid">
-        <div class="span6">
           <div class="threads">
-            服务器连接失败了...<br>
+            
           </div>
-        </div>
-        <div class="span6 sent">
           <form class="form-horizontal" data-spy="affix" data-offset-top="20">
             <div class="control-group">
               <div class="controls">
                 <textarea id="msg"></textarea>
               </div>
             </div>
-            <div class="control-group">
-              <div class="controls">
-                <div class="btn-group">
-                  <button type="submit" class="btn btn-success">Send</button>
-                </div>
-              </div>
-            </div>
           </form>
         </div>
       </div>
     </div>
-<textarea id="TPL-new-message" style="display:none">
-div(class="message #{source_type}")
-  div.avatar
-    img(src="assets/images/dummy_contact.png", width="32px", height="32px")
-  div.indicator
-  div.content
-    div.bd !{content}
-      time #{time}
-</textarea>
-<textarea id="TPL-message-bd" style="display:none">
-div.bd !{content}
-  time #{time}
-</textarea>
+    <textarea id="TPL-new-message" style="display:none">
+    <div class="message {{source_type}}">
+      <div class="avatar">
+        <img src="assets/images/dummy_contact.png", width="32px", height="32px" />
+      </div>
+      <div class="indicator"></div>
+      <div class="content">
+        <div class="bd">
+          {{{content}}}
+          <time>{{time}}</time>
+        </div>
+      </div>
+    </div>
+    </textarea>
+    <textarea id="TPL-message-bd" style="display:none">
+      <div class="bd">
+        {{{content}}}
+        <time>{{{time}}}</time>
+      </div>
+    </textarea>
   </body>
-  <script src="assets/third_party/jade/jade.js"></script>
+  <script src="assets/third_party/jquery/jquery-1.8.3.min.js"></script>
+  <script src="assets/third_party/mustache/mustache.js"></script>
   <script src="assets/third_party/socket.io/socket.io.js"></script>
-  <script src="assets/js/jquery-1.8.3.min.js"></script>
-  <script src="assets/third_party/bootstrap/js/bootstrap.js"></script>
-  <script src="assets/js/chat.js"></script>
+  <script data-main="src/ui/chat" src="src/require.js"></script>
 </html>

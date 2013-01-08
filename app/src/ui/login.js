@@ -15,25 +15,28 @@
  *  
  **/
 require(['../socket', '../friends'], function(socket, friends){
-var IS_CONNECTED = false;
+
+var is_connected = false;
 var tpl_contact = $("#TPL-contact").val();
 var channel = socket.get();
+var chat_windows = {};
 
 function on_relogin() {
-  IS_CONNECTED = false;
-  $(".contacts").hide("slow").html('<ul/>');
+  is_connected = false;
+  $(".main").hide("slow").html('<ul/>');
   $("form").show("slow");
 }
 
 function on_connect() {
   console.log("connect");
-  IS_CONNECTED = true;
+  is_connected = true;
 }
 
 // 登陆成功, 展现联系人的界面
-function on_login_success() {
+function on_login_success(msg) {
+  console.log(msg);
   $("form").hide("fadeIn");
-  $(".contacts").show("fadeOut");
+  $(".main").show("fadeOut");
 }
 
 // 获取到联系人的信息, 展示联系人
@@ -65,6 +68,25 @@ function display_filter_result(fs) {
 
 // 获取到新的消息.
 function on_new_message(message) {
+  var from_id = message.from_id;
+  if (!chat_windows[from_id]) {
+    chrome.app.window.create('chat.html?imid=' + from_id, {
+      'width': 360,
+      'height': 393,
+    }, function(w){
+      console.log(w);
+      chat_windows[from_id] = w;
+      w.contentWindow.postMessage({
+        type: 'new_message',
+        data: message
+      }, "*");
+    });
+  } else {
+    chat_windows[from_id].contentWindow.postMessage({
+      type: 'new_message',
+      data: message
+    }, "*");
+  }
   console.log(message);
 }
 
@@ -77,7 +99,7 @@ channel.on('new_message', on_new_message);
 
 // --- 页面UI事件绑定 ---
 $("button[type=submit]").click(function(){
-  if (!IS_CONNECTED) {
+  if (!is_connected) {
     return false;
   }
 
@@ -96,7 +118,11 @@ $("button[type=submit]").click(function(){
 });
 
 $(".contacts").on("click", "li", function(){
-  console.log(this);
+  var imid = $(this).data("imid");
+  chrome.app.window.create('chat.html?imid=' + imid, {
+    'width': 360,
+    'height': 393,
+  });
   return false;
 });
 
@@ -110,9 +136,6 @@ $(".filter input").on('input', function(){
     on_friend_list(friends.getTopFriends());
   }
 });
-
-
-
 
 
 
