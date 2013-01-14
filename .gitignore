@@ -3,6 +3,7 @@ themes
 erlang-baidu
 hipro
 hi.log
+debug.log
 *.sqlite
 *.sqlite-journal
 data/images

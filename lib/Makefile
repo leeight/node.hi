@@ -12,6 +12,8 @@ test-packet:
 test-model:
 	# 经常出错, 如何修复?
 	node_modules/nodeunit/bin/nodeunit test_model.js
+test-inet:
+	node test_inet.js
 
 stat:
 	wc -l `find . -path "*node_modules*" -prune -o -type f -name "*.js" -print`
