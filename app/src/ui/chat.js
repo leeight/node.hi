@@ -57,18 +57,21 @@ $("#msg").on('keypress', function(e){
     var msg = $(this).val().trim();
     if (msg) {
       if (last_from_id) {
-        channel.emit('send_message', {
-          to_id: last_from_id,
-          text: msg
-        });
+        if (channel && channel.emit) {
+          channel.emit('send_message', {
+            to_id: last_from_id,
+            text: msg
+          });
+        }
 
+        var source_type = 'outcoming';
         var message = {
-          source_type: 'outcoming',
+          source_type: source_type,
           content: htmlEncode(msg),
           time: new Date().toString()
         };
         var last = $(".threads .message:last-child");
-        if (last.hasClass("outcoming")) {
+        if (last.hasClass(source_type)) {
           last.find('.content').append(Mustache.to_html(tpl_bd, message));
         } else {
           $(".threads").append(Mustache.to_html(tpl_new_message, message));
