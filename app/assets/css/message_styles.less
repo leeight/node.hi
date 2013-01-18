@@ -32,7 +32,9 @@ html, body {
 
   .content {
     padding: 6px 15px;
-    width: 300px;
+    min-width: 300px;
+    width: ~"-webkit-calc(100% - 114px)";
+    width: ~"calc(100% - 114px)";
 
     .border-radius(4px);
     .box-shadow(1px 1px 3px 0px rgba(0,0,0,.5));

@@ -12,7 +12,7 @@
  * @author leeight(liyubei@baidu.com)
  * @version $Revision$ 
  * @description 
- *  
+ * 跨页面交互的一些方法，模拟socket.io的接口.
  **/
 define(function(){
   var handlers = {};
@@ -20,16 +20,34 @@ define(function(){
     handlers[type] = callback;
   }
 
-  window.addEventListener('message', function(e){
+  function handleMessageEvent(e) {
     var payload = e.data;
     var type = payload.type;
     var data = payload.data;
     if (handlers[type]) {
       handlers[type].call(null, data);
     }
-  }, false);
+  }
+
+  /**
+   * @type {Window} main
+   * @type {Window} sub
+   */
+  function connect(main, sub) {
+    sub.addEventListener('message', handleMessageEvent, false);
+    main.addEventListener('message', handleMessageEvent, false);
+  }
+
+  function emit(type, data) {
+    window.opener.postMessage({
+      type: type,
+      data: data
+    }, "*");
+  }
 
   return {
+    connect: connect,
+    emit: emit,
     on: on
   };
 });

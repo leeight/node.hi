@@ -14,10 +14,11 @@
  * @description 
  *  
  **/
-require(['../socket', '../friends'], function(socket, friends){
+require(['../socket', '../friends', '../debug', './ui'], function(socket, friends, debug, ui){
 
 var is_connected = false;
 var tpl_contact = $("#TPL-contact").val();
+var tpl_me = $("#TPL-me").val();
 var channel = socket.get();
 var chat_windows = {};
 
@@ -69,25 +70,18 @@ function display_filter_result(fs) {
 // 获取到新的消息.
 function on_new_message(message) {
   var from_id = message.from_id;
-  if (!chat_windows[from_id]) {
-    chrome.app.window.create('chat.html?imid=' + from_id, {
-      'width': 360,
-      'height': 393,
-    }, function(w){
-      console.log(w);
-      chat_windows[from_id] = w;
-      w.contentWindow.postMessage({
-        type: 'new_message',
-        data: message
-      }, "*");
-    });
-  } else {
-    chat_windows[from_id].contentWindow.postMessage({
+  var url = 'chat.html?imid=' + from_id;
+  ui.createChatWindow(url, function(w){
+    w.postMessage({
       type: 'new_message',
       data: message
     }, "*");
-  }
-  console.log(message);
+  });
+}
+
+// 获取到当前登录人的信息
+function on_after_user_query(user) {
+  $(".main .header").html(Mustache.to_html(tpl_me, user));
 }
 
 channel.on('connect', on_connect);
@@ -96,6 +90,7 @@ channel.on('close', on_relogin);
 channel.on('login_success', on_login_success);
 channel.on('friend_list', on_friend_list);
 channel.on('new_message', on_new_message);
+channel.on('after_user_query', on_after_user_query);
 
 // --- 页面UI事件绑定 ---
 $("button[type=submit]").click(function(){
@@ -119,10 +114,8 @@ $("button[type=submit]").click(function(){
 
 $(".contacts").on("click", "li", function(){
   var imid = $(this).data("imid");
-  chrome.app.window.create('chat.html?imid=' + imid, {
-    'width': 360,
-    'height': 393,
-  });
+  var url = 'chat.html?imid=' + imid;
+  ui.createChatWindow(url);
   return false;
 });
 
@@ -136,6 +129,13 @@ $(".filter input").on('input', function(){
     on_friend_list(friends.getTopFriends());
   }
 });
+
+
+if (debug.isEnable()) {
+  on_login_success('OK');
+  on_after_user_query(debug.getDefaultUser());
+  on_friend_list(debug.getDefaultFriendList());
+}
 
 
 

@@ -49,6 +49,17 @@ io.sockets.on('connection', function (socket) {
     });
   });
 
+  client.on('after_user_query', function(){
+    socket.emit('after_user_query', {
+      'imid': this.user.imid,
+      'personal_comment': this.user.personal_comment,
+      'nickname': this.user.nickname,
+      'name': this.user.name,
+      'account': this.user.account,
+      'avatar': this.user.getAvatar(),
+    });
+  });
+
   client.on('friend_list', function(friends){
     socket.emit('friend_list', friends);
   });

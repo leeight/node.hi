@@ -16,6 +16,8 @@
     "32": "assets/images/64x64.jpg",
     "128": "assets/images/128x128.png"
   },
+  "content_security_policy": "script-src 'self'; object-src 'self'; img-src 'self' http://placekitten.com http://localhost:1337",
+  "update_url": "https://raw.github.com/leeight/node.hi/master/update.xml",
   "permissions": [
     "clipboardRead",
     "clipboardWrite",
