@@ -21,7 +21,7 @@ var tpl_contact = $("#TPL-contact").val();
 var tpl_me = $("#TPL-me").val();
 var serverChannel = socket.get();
 var clientChannel = channel;
-var chat_windows = {};
+var mine;   // 我的信息
 
 function on_relogin() {
   is_connected = false;
@@ -73,16 +73,14 @@ function on_new_message(message) {
   var from_id = message.from_id;
   var url = 'chat.html?imid=' + from_id;
   ui.createChatWindow(url, function(w){
-    w.postMessage({
-      type: 'new_message',
-      data: message
-    }, "*");
+    clientChannel.emit(w, 'new_message', message);
   });
 }
 
 // 获取到当前登录人的信息
 function on_after_user_query(user) {
   $(".main .header").html(Mustache.to_html(tpl_me, user));
+  mine = user;
 }
 
 // Server Channel Events
@@ -99,9 +97,17 @@ clientChannel.init(window);
 clientChannel.on('after_init', function(data){
   var window_id = data.window_id;
   var imid = data.imid;
-  clientChannel.emit(ui.findChatWindow(window_id), 'after_user_query', friends.find(imid));
+  clientChannel.emit(ui.findChatWindow(window_id), 'after_user_query', {
+    friend: friends.find(imid),
+    mine: mine
+  });
+  if (debug.isEnable()) {
+    clientChannel.emit(ui.findChatWindow(window_id),
+      'new_message', debug.getIncomingMesage());
+  }
 });
 clientChannel.on('send_message', function(data){
+  serverChannel.emit('send_message', data);
   console.log(data);
 });
 

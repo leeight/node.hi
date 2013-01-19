@@ -56,7 +56,7 @@ io.sockets.on('connection', function (socket) {
       'nickname': this.user.nickname,
       'name': this.user.name,
       'account': this.user.account,
-      'avatar': this.user.getAvatar(),
+      'avatar': this.user.avatar
     });
   });
 

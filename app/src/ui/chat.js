@@ -21,6 +21,8 @@ var tpl_bd = $("#TPL-message-bd").val();
 var tpl_me = $("#TPL-me").val();
 var last_from_id = document.location.search.replace(/\?imid=/, '');
 var window_id = (location.pathname + location.search).substr(1);
+var friend;   // 好友的信息
+var mine;     // 我的信息
 
 function htmlEncode(value){ 
   if (value) {
@@ -40,6 +42,7 @@ function on_new_message(message) {
   if (!message.source_type) {
     message.source_type = 'incoming';
   }
+  message.avatar = mine.avatar;
   var last = $(".threads .message:last-child");
   if (last.hasClass(message.source_type)) {
     last.data('from-id', message.from_id);
@@ -49,8 +52,11 @@ function on_new_message(message) {
   }
 }
 
-function on_after_user_query(user) {
-  $(".header").html(Mustache.to_html(tpl_me, user));
+function on_after_user_query(data) {
+  $(".header").html(Mustache.to_html(tpl_me, data.friend));
+  friend = data.friend;
+  mine = data.mine;
+  console.log(data);
 }
 
 // --- Server Events ---
@@ -80,6 +86,7 @@ $("#msg").on('keypress', function(e){
 
         var source_type = 'outcoming';
         var message = {
+          avatar: friend.avatar,
           source_type: source_type,
           content: htmlEncode(msg),
           time: new Date().toString()

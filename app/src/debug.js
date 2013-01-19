@@ -25,7 +25,7 @@ define(function(){
     getDefaultUser: function() {
       return {
         'imid': 8964,
-        'avatar': 'http://127.0.0.1:1337/1/0.jpg',
+        'avatar': '0.jpg',
         'account': 'linuxracer(debug)',
         'personal_comment': 'hello world(debug)'
       };
