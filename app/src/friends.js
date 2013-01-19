@@ -35,6 +35,13 @@ function add(friend) {
 }
 
 /**
+ * @type {string} imid
+ */
+function find(imid) {
+  return _friends[imid] || null;
+}
+
+/**
  * TODO 支持拼音?
  * 按照关键词搜索, 返回一批好友
  * @param {string} query 搜索关键词.
@@ -129,6 +136,7 @@ function _isMatch(friend, query) {
 
 return {
   add: add,
+  find: find,
   search: search,
   getTopFriends: getTopFriends
 }

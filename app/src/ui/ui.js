@@ -65,8 +65,14 @@ define('ui', ['../debug', '../channel'], function(debug, channel){
     createWindow(url, options, opt_callback);
   }
 
+  function findChatWindow(windowId) {
+    console.log(_windowsCache);
+    return _windowsCache[windowId];
+  }
+
   return {
     createWindow: createWindow,
+    findChatWindow: findChatWindow,
     createChatWindow: createChatWindow
   }
 });

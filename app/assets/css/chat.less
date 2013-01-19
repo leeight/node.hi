@@ -30,7 +30,14 @@ html, body {
 }
 #msg {
   height: 60px;
-  width: 100%;
+  width: ~"-webkit-calc(100% - 95px)";
+  position: fixed;
+  bottom: 10px;
+  left: 42px;
+  opacity: 0.5;
+  &:focus {
+    opacity: 9;
+  }
 }
 
 figure {

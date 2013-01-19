@@ -25,17 +25,27 @@ define(function(){
     getDefaultUser: function() {
       return {
         'imid': 8964,
-        'avatar': 'http://127.0.0.1:1337/?md5=0&ext=jpg&type=0',
+        'avatar': 'http://127.0.0.1:1337/1/0.jpg',
         'account': 'linuxracer(debug)',
         'personal_comment': 'hello world(debug)'
       };
     },
     getDefaultFriendList: function() {
       var friends = [
-        {'avatar': '', 'client_type': 0, 'psp_status': '', 'status': 5, 'personal_comment': '', 'birthday': '1980-2-24', 'sex': 2, 'email': 'yaoasm1@126.com', 'music': '', 'nickname':'', 'personal_desc': '', 'imid': 32353201, 'monicker': '', 'baiduid': 'yaoasm', 'has_camera': ''},
+        {'avatar': '2.jpg', 'client_type': 0, 'psp_status': '', 'status': 5, 'personal_comment': '', 'birthday': '1980-2-24', 'sex': 2, 'email': 'yaoasm1@126.com', 'music': '', 'nickname':'', 'personal_desc': '', 'imid': 32353201, 'monicker': '', 'baiduid': 'yaoasm', 'has_camera': ''},
         {'avatar': '1e82e5a0e0bd1081cf2b5a99e9b1cd93.png', 'client_type': 1, 'psp_status': '', 'status': 1, 'personal_comment': '', 'birthday': '0-0-0', 'sex': 2, 'email': 'wangm1800@163.com', 'nickname': '王敏', 'imid': 346518627, 'baiduid': 'wangminsy001', 'has_camera': ''}
       ];
       return friends;
+    },
+    getIncomingMesage: function() {
+      var message = {
+        "source_type": "incoming",
+        "content": "hello world",
+        "from_id": "123456",
+        "time": Date.now()
+      }
+
+      return message;
     }
   }
 });

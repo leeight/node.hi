@@ -14,12 +14,13 @@
  * @description 
  *  
  **/
-require(['../socket', '../friends', '../debug', './ui'], function(socket, friends, debug, ui){
+require(['../socket', '../friends', '../debug', './ui', '../channel'], function(socket, friends, debug, ui, channel){
 
 var is_connected = false;
 var tpl_contact = $("#TPL-contact").val();
 var tpl_me = $("#TPL-me").val();
-var channel = socket.get();
+var serverChannel = socket.get();
+var clientChannel = channel;
 var chat_windows = {};
 
 function on_relogin() {
@@ -84,13 +85,25 @@ function on_after_user_query(user) {
   $(".main .header").html(Mustache.to_html(tpl_me, user));
 }
 
-channel.on('connect', on_connect);
-channel.on('disconnect', on_relogin);
-channel.on('close', on_relogin);
-channel.on('login_success', on_login_success);
-channel.on('friend_list', on_friend_list);
-channel.on('new_message', on_new_message);
-channel.on('after_user_query', on_after_user_query);
+// Server Channel Events
+serverChannel.on('connect', on_connect);
+serverChannel.on('disconnect', on_relogin);
+serverChannel.on('close', on_relogin);
+serverChannel.on('login_success', on_login_success);
+serverChannel.on('friend_list', on_friend_list);
+serverChannel.on('new_message', on_new_message);
+serverChannel.on('after_user_query', on_after_user_query);
+
+// Client Channel Events
+clientChannel.init(window);
+clientChannel.on('after_init', function(data){
+  var window_id = data.window_id;
+  var imid = data.imid;
+  clientChannel.emit(ui.findChatWindow(window_id), 'after_user_query', friends.find(imid));
+});
+clientChannel.on('send_message', function(data){
+  console.log(data);
+});
 
 // --- 页面UI事件绑定 ---
 $("button[type=submit]").click(function(){
@@ -105,7 +118,7 @@ $("button[type=submit]").click(function(){
     return false;
   }
 
-  channel.emit('login', {
+  serverChannel.emit('login', {
     'username': username,
     'password': password
   });

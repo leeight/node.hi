@@ -12,15 +12,7 @@
     <div class="container">
       <div class="row-fluid">
         <div class="span12">
-          <div class="header">
-            <figure>
-              <img src="http://placekitten.com/36/36" width="36px" height="36px" alt="Avatar" />
-              <figcaption>
-                <div class="baiduid">Baidu Id</div>
-                <div class="personal-comment">Personal comment...</div>
-              </figcaption>
-            </figure>
-          </div>
+          <div class="header"></div>
           <div class="threads"></div>
           <form class="form-horizontal" data-spy="affix" data-offset-top="20">
             <div class="control-group">
@@ -32,6 +24,15 @@
         </div>
       </div>
     </div>
+    <textarea id="TPL-me" style="display:none">
+      <figure data-imid="{{imid}}">
+        <img src="http://127.0.0.1:1337/1/{{avatar}}" width="36px" height="36px" alt="Avatar" />
+        <figcaption>
+          <div class="baiduid">{{baiduid}}</div>
+          <div class="personal-comment">{{#personal_comment}}{{personal_comment}}{{/personal_comment}}{{^personal_comment}}暂无.{{/personal_comment}}</div>
+        </figcaption>
+      </figure>
+    </textarea>
     <textarea id="TPL-new-message" style="display:none">
     <div class="message {{source_type}}">
       <div class="avatar">

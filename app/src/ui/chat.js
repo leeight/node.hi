@@ -14,11 +14,13 @@
  * @description 
  *  
  **/
-require(['../channel'], function(channel){
+require(['../channel', '../debug'], function(channel, debug){
 
 var tpl_new_message = $("#TPL-new-message").val();
 var tpl_bd = $("#TPL-message-bd").val();
+var tpl_me = $("#TPL-me").val();
 var last_from_id = document.location.search.replace(/\?imid=/, '');
+var window_id = (location.pathname + location.search).substr(1);
 
 function htmlEncode(value){ 
   if (value) {
@@ -47,9 +49,21 @@ function on_new_message(message) {
   }
 }
 
+function on_after_user_query(user) {
+  $(".header").html(Mustache.to_html(tpl_me, user));
+}
+
 // --- Server Events ---
+channel.init(window);
 channel.on('connect', on_connect);
 channel.on('new_message', on_new_message);
+channel.on('after_user_query', on_after_user_query);
+
+// --- Notify Parent Window ----
+channel.emit(window.opener, 'after_init', {
+  window_id: window_id,
+  imid: last_from_id
+});
 
 // --- UI Events ---
 $("#msg").on('keypress', function(e){
@@ -58,7 +72,7 @@ $("#msg").on('keypress', function(e){
     if (msg) {
       if (last_from_id) {
         if (channel && channel.emit) {
-          channel.emit('send_message', {
+          channel.emit(window.opener, 'send_message', {
             to_id: last_from_id,
             text: msg
           });
@@ -86,6 +100,9 @@ $("#msg").on('keypress', function(e){
 
 
 
+if (debug.isEnable()) {
+  channel.emit(window, 'new_message', debug.getIncomingMesage());
+}
 
 
 
