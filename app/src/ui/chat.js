@@ -38,6 +38,7 @@ function on_connect() {
 }
 
 function on_new_message(message) {
+  debugger;
   last_from_id = message.from_id;
   if (!message.source_type) {
     message.source_type = 'incoming';
@@ -56,7 +57,16 @@ function on_after_user_query(data) {
   $(".header").html(Mustache.to_html(tpl_me, data.friend));
   friend = data.friend;
   mine = data.mine;
-  console.log(data);
+  document.title = 'Chat with ' + friend.baiduid;
+}
+
+function on_ping_ack(data) {
+  // Client Channel Is Ready.
+  // --- Notify Parent Window ----
+  channel.emit(window.opener, 'after_init', {
+    window_id: window_id,
+    imid: last_from_id
+  });
 }
 
 // --- Server Events ---
@@ -64,12 +74,10 @@ channel.init(window);
 channel.on('connect', on_connect);
 channel.on('new_message', on_new_message);
 channel.on('after_user_query', on_after_user_query);
+channel.on('ping_ack', on_ping_ack);
 
-// --- Notify Parent Window ----
-channel.emit(window.opener, 'after_init', {
-  window_id: window_id,
-  imid: last_from_id
-});
+// TODO(leeight) 接口不友好.
+channel.ping(window.opener, {window_id: window_id});
 
 // --- UI Events ---
 $("#msg").on('keypress', function(e){

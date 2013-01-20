@@ -25,6 +25,9 @@
  * channel.emit(window.opener, 'my_event', data);
  **/
 define(function(){
+  var isReady = false;
+  var peerIsReady = false;
+
   var handlers = {};
 
   /**
@@ -48,6 +51,15 @@ define(function(){
    */
   function init(w) {
     w.addEventListener('message', handleMessageEvent, false);
+    isReady = true;
+  }
+
+  function channelIsReady() {
+    return isReady && peerIsReady;
+  }
+
+  function setPeerReady() {
+    peerIsReady = true;
   }
 
   /**
@@ -56,6 +68,10 @@ define(function(){
    * @type {Object} data The event data.
    */
   function emit(w, type, data) {
+    if (!channelIsReady()) {
+      throw new Error("Client Channel is not ready");
+    }
+
     if (w && !w.closed) {
       // 有时候sub window还没有初始化好, 发送的事件
       // 可能就别丢弃了
@@ -66,10 +82,61 @@ define(function(){
     }
   }
 
+  function ping(w, data) {
+    if (w && !w.closed) {
+      w.postMessage({
+        type: 'ping',
+        data: data
+      }, "*");
+    }
+  }
+
+  /**
+   * @type {Window} peerWindow
+   */
+  function ClientChannel(peerWindow) {
+    this._peerWindow = peerWindow;
+    this._handlers = {};
+    window.addEventListener('message', this._handleMessageEvent.bind(this), false);
+  }
+
+  ClientChannel.prototype._handleMessageEvent = function(e) {
+    var payload = e.data;
+    var type = payload.type;
+    var data = payload.data;
+    if (this._handlers[type]) {
+      this._handlers[type].call(null, data);
+    }
+  }
+
+  ClientChannel.prototype.on = function(type, callback) {
+    this._handlers[type] = callback;
+  }
+
+  /**
+   * @param {string} type
+   * @param {*} data
+   */
+  ClientChannel.prototype.emit = function(type, data) {
+    if (this._peerWindow && !this._peerWindow.closed) {
+      this._peerWindow.postMessage({
+        type: type,
+        data: data
+      }, "*");
+    }
+  }
+
+  ClientChannel.prototype.ping = function() {
+    this.emit('ping');
+  }
+
   return {
     init: init,
+    ping: ping,
+    setPeerReady: setPeerReady,
     emit: emit,
-    on: on
+    on: on,
+    ClientChannel: ClientChannel
   };
 });
 

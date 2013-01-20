@@ -37,15 +37,18 @@ define(function(){
       ];
       return friends;
     },
-    getIncomingMesage: function() {
+    getIncomingMesage: function(opt_imid) {
       var message = {
         "source_type": "incoming",
-        "content": "hello world",
-        "from_id": "123456",
+        "content": "hello world " + Math.random(),
+        "from_id": (opt_imid || "346518627"),
         "time": Date.now()
       }
 
       return message;
+    },
+    log: function(msg) {
+      $("#debug-msg").append("[" + new Date().toJSON() + "]:" + msg + "<br>");
     }
   }
 });

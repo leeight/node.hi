@@ -102,8 +102,7 @@ clientChannel.on('after_init', function(data){
     mine: mine
   });
   if (debug.isEnable()) {
-    clientChannel.emit(ui.findChatWindow(window_id),
-      'new_message', debug.getIncomingMesage());
+    on_new_message(debug.getIncomingMesage(imid));
   }
 });
 clientChannel.on('send_message', function(data){

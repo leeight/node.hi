@@ -14,14 +14,12 @@
  * @description 
  *  
  **/
-define('ui', ['../debug', '../channel'], function(debug, channel){
+define(['../debug', '../channel'], function(debug, channel){
   /** @type {Object.<string, Window>} */
   var _windowsCache = {};
 
   function addCache(id, w) {
     _windowsCache[id] = w;
-    // FIXME(leeight)
-    // channel.connect(w.opener, w);
     w.onclose = function() {
       delete _windowsCache[id];
     }
@@ -66,7 +64,6 @@ define('ui', ['../debug', '../channel'], function(debug, channel){
   }
 
   function findChatWindow(windowId) {
-    console.log(_windowsCache);
     return _windowsCache[windowId];
   }
 
