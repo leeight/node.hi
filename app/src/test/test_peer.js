@@ -17,8 +17,12 @@
 require(['../channel', '../debug'], function(channel, debug){
 
 var clientChannel = new channel.ClientChannel(window.opener);
-clientChannel.on('ping', function(){
-  debug.log('Receive ping_ack from peer window.');
+clientChannel.on('ping', function(data){
+  debug.log('Receive ping_ack from peer window [' + data.__peer_id__ + '].');
+  document.title += (" " + clientChannel.getId());
+  $("#say-hello-world").click(function(){
+    clientChannel.emit('hello_world');
+  });
 });
 clientChannel.ping();
 debug.log('Sent ping packet.');

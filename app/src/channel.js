@@ -25,71 +25,59 @@
  * channel.emit(window.opener, 'my_event', data);
  **/
 define(function(){
-  var isReady = false;
-  var peerIsReady = false;
-
-  var handlers = {};
+  var ChannelPool = {
+    _channels: {},
+    _prefix: Math.floor(Math.random() * 2147483648).toString(36),
+    _uniqId: 0,
+    getNextId: function() {
+      return this._prefix + ':' + (this._uniqId ++);
+    },
+    get: function(id) {
+      return this._channels[id];
+    },
+    getByUrl: function(peerUrl) {
+      for(var key in this._channels) {
+        var channel = this._channels[key];
+        var peerWindow = channel.getPeerWindow();
+        if (peerWindow && !peerWindow.closed) {
+          if (peerWindow.location.href === peerUrl) {
+            return channel;
+          }
+        }
+      }
+    },
+    add: function(channel, opt_id) {
+      var id = opt_id || channel.getId();
+      if (!this._channels[id]) {
+        this._channels[id] = channel;
+      }
+    },
+    remove: function(channel) {
+      delete this._channels[channel.getId()];
+    }
+  };
 
   /**
-   * 监听自定义的事件.
+   * 主页面可以打开多个聊天窗口，因此在主页面存在多个ClientChannel的实例.
+   * 我们需要存在一个统一分发postMessage事件的地方.
    */
-  function on(type, callback) {
-    handlers[type] = callback;
-  }
-
-  function handleMessageEvent(e) {
+  window.addEventListener('message', function(e){
     var payload = e.data;
+
     var type = payload.type;
     var data = payload.data;
-    if (handlers[type]) {
-      handlers[type].call(null, data);
+    var peerChannelId = data['__peer_id__'];
+    var peerUrl = data['__peer_url__'];
+
+    var channel = (type === 'ping') ? ChannelPool.getByUrl(peerUrl) : 
+      ChannelPool.get(peerChannelId);
+    if (channel) {
+      channel.handleEvent(type, data);
+      ChannelPool.add(channel, peerChannelId);
+    } else {
+      throw new Error("Can\'t find client channel by id = [" + peerChannelId + "]");
     }
-  }
-
-  /**
-   * @type {Window} w
-   */
-  function init(w) {
-    w.addEventListener('message', handleMessageEvent, false);
-    isReady = true;
-  }
-
-  function channelIsReady() {
-    return isReady && peerIsReady;
-  }
-
-  function setPeerReady() {
-    peerIsReady = true;
-  }
-
-  /**
-   * @type {Window} w The main or sub window’s reference.
-   * @type {string} type The event type.
-   * @type {Object} data The event data.
-   */
-  function emit(w, type, data) {
-    if (!channelIsReady()) {
-      throw new Error("Client Channel is not ready");
-    }
-
-    if (w && !w.closed) {
-      // 有时候sub window还没有初始化好, 发送的事件
-      // 可能就别丢弃了
-      w.postMessage({
-        type: type,
-        data: data
-      }, "*");
-    }
-  }
-
-  function ping(w, data) {
-    if (w && !w.closed) {
-      w.postMessage({
-        type: 'ping',
-        data: data
-      }, "*");
-    }
-  }
+  }, false);
 
   /**
    * @type {Window} peerWindow
@@ -97,13 +85,37 @@ define(function(){
   function ClientChannel(peerWindow) {
     this._peerWindow = peerWindow;
     this._handlers = {};
-    window.addEventListener('message', this._handleMessageEvent.bind(this), false);
+    this._id = ChannelPool.getNextId();
+    this._peerId = '';
+    ChannelPool.add(this);
   }
 
-  ClientChannel.prototype._handleMessageEvent = function(e) {
-    var payload = e.data;
-    var type = payload.type;
-    var data = payload.data;
+  /**
+   * @param {string} peerId
+   */
+  ClientChannel.prototype.setPeerId = function(peerId) {
+    this._peerId = peerId;
+  }
+
+  /**
+   * @return {string}
+   */
+  ClientChannel.prototype.getId = function() {
+    return this._id;
+  }
+
+  /**
+   * @return {Window}
+   */
+  ClientChannel.prototype.getPeerWindow = function() {
+    return this._peerWindow;
+  }
+
+  /**
+   * @param {string} type
+   * @param {*} data
+   */
+  ClientChannel.prototype.handleEvent = function(type, data) {
     if (this._handlers[type]) {
       this._handlers[type].call(null, data);
     }
@@ -115,10 +127,13 @@ define(function(){
 
   /**
    * @param {string} type
-   * @param {*} data
+   * @param {*=} opt_data
    */
-  ClientChannel.prototype.emit = function(type, data) {
+  ClientChannel.prototype.emit = function(type, opt_data) {
     if (this._peerWindow && !this._peerWindow.closed) {
+      var data = opt_data || {};
+      data['__peer_id__'] = this._id;
+      data['__peer_url__'] = window.location.href;
       this._peerWindow.postMessage({
         type: type,
         data: data
@@ -130,12 +145,11 @@ define(function(){
     this.emit('ping');
   }
 
+  ClientChannel.prototype.close = function() {
+    ChannelPool.remove(this);
+  }
+
   return {
-    init: init,
-    ping: ping,
-    setPeerReady: setPeerReady,
-    emit: emit,
-    on: on,
     ClientChannel: ClientChannel
   };
 });

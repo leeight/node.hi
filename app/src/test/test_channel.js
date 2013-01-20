@@ -17,14 +17,26 @@
 
 require(['../channel', '../debug', '../ui/ui'], function(channel, debug, ui){
 
-ui.createChatWindow('test_peer.html', function(peerWindow){
-  var clientChannel = new channel.ClientChannel(peerWindow);
-  clientChannel.on('ping', function(pw){
-    debug.log('Receive ping from peer window, i\'ll ping back soon.');
-    clientChannel.ping();
-    debug.log("Sent ping ack packet.");
-  });
-});
+var count = 0;
+
+function launchChatWindow() {
+	ui.createChatWindow('test_peer.html?id=' + (count ++), function(peerWindow){
+	  var clientChannel = new channel.ClientChannel(peerWindow);
+	  clientChannel.on('ping', function(data){
+	    debug.log('Receive ping from peer window [' + data.__peer_id__ + '], i\'ll ping back soon.');
+	    clientChannel.ping();
+	    debug.log("Sent ping ack packet.");
+	  });
+	  clientChannel.on('hello_world', function(data){
+      debug.log('Receive hello world from peer window [' + data.__peer_id__ + ']');
+	  });
+	  clientChannel.on('close', function(data){
+	  	debug.log('Channel was closed.');
+	  })
+	});
+	return false;
+}
+$("#launch-chat-window").click(launchChatWindow);
 
 });
 

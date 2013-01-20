@@ -14,7 +14,8 @@
  * @description 
  *  
  **/
-require(['../socket', '../friends', '../debug', './ui', '../channel'], function(socket, friends, debug, ui, channel){
+require(['../socket', '../friends', '../debug', './ui', '../channel'],
+function(socket, friends, debug, ui, channel){
 
 var is_connected = false;
 var tpl_contact = $("#TPL-contact").val();

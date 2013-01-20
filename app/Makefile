@@ -14,4 +14,7 @@ all: $(HTML) $(CSS)
 clean:
 		rm -f $(HTML) $(CSS)
 
+stat:
+	wc -l `find . -path "*third_party*" -prune -o -type f -name "*.js" -print`
+
 .PHONY: clean
