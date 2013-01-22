@@ -20,7 +20,6 @@ var tpl_new_message = $("#TPL-new-message").val();
 var tpl_bd = $("#TPL-message-bd").val();
 var tpl_me = $("#TPL-me").val();
 var last_from_id = document.location.search.replace(/\?imid=/, '');
-var window_id = (location.pathname + location.search).substr(1);
 var friend;   // 好友的信息
 var mine;     // 我的信息
 
@@ -38,12 +37,11 @@ function on_connect() {
 }
 
 function on_new_message(message) {
-  debugger;
   last_from_id = message.from_id;
   if (!message.source_type) {
     message.source_type = 'incoming';
   }
-  message.avatar = mine.avatar;
+  message.avatar = friend.avatar;
   var last = $(".threads .message:last-child");
   if (last.hasClass(message.source_type)) {
     last.data('from-id', message.from_id);
@@ -60,24 +58,23 @@ function on_after_user_query(data) {
   document.title = 'Chat with ' + friend.baiduid;
 }
 
-function on_ping_ack(data) {
-  // Client Channel Is Ready.
+function on_ping(data) {
   // --- Notify Parent Window ----
-  channel.emit(window.opener, 'after_init', {
-    window_id: window_id,
+  clientChannel.emit('after_init', {
     imid: last_from_id
   });
 }
 
 // --- Server Events ---
-channel.init(window);
-channel.on('connect', on_connect);
-channel.on('new_message', on_new_message);
-channel.on('after_user_query', on_after_user_query);
-channel.on('ping_ack', on_ping_ack);
+var clientChannel = new channel.ClientChannel(window.opener);
+clientChannel.on('connect', on_connect);
+clientChannel.on('new_message', on_new_message);
+clientChannel.on('after_user_query', on_after_user_query);
+clientChannel.on('ping', on_ping);
 
-// TODO(leeight) 接口不友好.
-channel.ping(window.opener, {window_id: window_id});
+// --- Client Channel Is Ready.
+clientChannel.ready();
+clientChannel.ping();
 
 // --- UI Events ---
 $("#msg").on('keypress', function(e){
@@ -85,8 +82,8 @@ $("#msg").on('keypress', function(e){
     var msg = $(this).val().trim();
     if (msg) {
       if (last_from_id) {
-        if (channel && channel.emit) {
-          channel.emit(window.opener, 'send_message', {
+        if (clientChannel && clientChannel.emit) {
+          clientChannel.emit('send_message', {
             to_id: last_from_id,
             text: msg
           });
@@ -94,7 +91,7 @@ $("#msg").on('keypress', function(e){
 
         var source_type = 'outcoming';
         var message = {
-          avatar: friend.avatar,
+          avatar: mine.avatar,
           source_type: source_type,
           content: htmlEncode(msg),
           time: new Date().toString()
@@ -116,7 +113,7 @@ $("#msg").on('keypress', function(e){
 
 
 if (debug.isEnable()) {
-  channel.emit(window, 'new_message', debug.getIncomingMesage());
+  clientChannel.emit('new_message', debug.getIncomingMesage());
 }
 
 

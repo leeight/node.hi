@@ -20,9 +20,9 @@ define(['../debug', '../channel'], function(debug, channel){
 
   function addCache(id, w) {
     _windowsCache[id] = w;
-    w.onclose = function() {
+    w.addEventListener('beforeunload', function(){
       delete _windowsCache[id];
-    }
+    });
   }
 
   var createWindow = debug.isLocal() ? function(url, options, opt_callback) {

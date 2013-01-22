@@ -43,6 +43,9 @@ define(function(){
           if (peerWindow.location.href === peerUrl) {
             return channel;
           }
+        } else if (peerWindow && peerWindow.closed) {
+          channel.close();
+          delete this._channels[key];
         }
       }
     },
@@ -87,7 +90,15 @@ define(function(){
     this._handlers = {};
     this._id = ChannelPool.getNextId();
     this._peerId = '';
+    this._isReady = false;
+    this._deferEvents = [];
+    this._peerWindow.addEventListener('beforeunload',
+      this.close.bind(this), false);
     ChannelPool.add(this);
+  }
+
+  ClientChannel.findByWindow = function(peerWindow) {
+    return ChannelPool.getByUrl(peerWindow.location.href);
   }
 
   /**
@@ -95,6 +106,19 @@ define(function(){
    */
   ClientChannel.prototype.setPeerId = function(peerId) {
     this._peerId = peerId;
+  }
+
+  ClientChannel.prototype.ready = function() {
+    if (this._isReady) {
+      return;
+    }
+
+    this._isReady = true;
+    for(var i = 0; i < this._deferEvents.length; i ++) {
+      var item = this._deferEvents[i];
+      this.emit(item[0], item[1]);
+    }
+    this._deferEvents.length = 0;
   }
 
   /**
@@ -130,6 +154,11 @@ define(function(){
    * @param {*=} opt_data
    */
   ClientChannel.prototype.emit = function(type, opt_data) {
+    if (!this._isReady) {
+      this._deferEvents.push([type, opt_data]);
+      return;
+    }
+
     if (this._peerWindow && !this._peerWindow.closed) {
       var data = opt_data || {};
       data['__peer_id__'] = this._id;
@@ -146,6 +175,7 @@ define(function(){
   }
 
   ClientChannel.prototype.close = function() {
+    this.emit('close');
     ChannelPool.remove(this);
   }
 
