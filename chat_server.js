@@ -49,6 +49,10 @@ io.sockets.on('connection', function (socket) {
     });
   });
 
+  client.on('contact_notify', function(friend){
+    socket.emit('contact_notify', friend);
+  });
+
   client.on('after_user_query', function(){
     socket.emit('after_user_query', {
       'imid': this.user.imid,

@@ -117,6 +117,10 @@ function on_after_user_query(user) {
   mine = user;
 }
 
+function on_contact_notify(friend) {
+  $("li[data-imid=" + friend.imid + "] > i").attr("class", "icon status-" + friend.status);
+}
+
 // Server Channel Events
 serverChannel.on('connect', on_connect);
 serverChannel.on('disconnect', on_relogin);
@@ -125,6 +129,7 @@ serverChannel.on('login_success', on_login_success);
 serverChannel.on('friend_list', on_friend_list);
 serverChannel.on('new_message', on_new_message);
 serverChannel.on('after_user_query', on_after_user_query);
+serverChannel.on('contact_notify', on_contact_notify);
 
 // --- 页面UI事件绑定 ---
 $("button[type=submit]").click(function(){
