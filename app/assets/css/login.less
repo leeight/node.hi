@@ -27,7 +27,38 @@ ul, li {
 }
 
 .form-horizontal {
-  padding: 0 20px;
+  width: 250px;
+  .border-radius(4px);
+  #gradient > .vertical(#f6f6f6, #b8bcc4);
+
+  .avatar {
+    width: 55px;
+    height: 55px;
+    border: 1px solid #a1a1a1;
+    .border-radius(3px);
+    #gradient > .vertical(#fefefe, #d0d0d0);
+  }
+
+  input {
+    border: none;
+    outline: none;
+    height: 32px;
+    line-height: 32px;
+    width: 244px;
+    margin: 0 2px 2px 2px;
+    background: transparent;
+    text-align: center;
+  }
+}
+#username {
+  opacity: 0.8;
+  // border: 1px solid #e6e8ec;
+  // border-bottom-color: #b2b5bd;
+  background: #d8dde5;
+  .box-shadow(0px 3px 3px 0px rgba(0,0,0,0.5));
+}
+#password {
+  background: #e6eaef;
 }
 
 figure {
