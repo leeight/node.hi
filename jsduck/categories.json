@@ -1,0 +1,13 @@
+[
+    {
+        "name": "MY-TEST",
+        "groups": [
+            {
+                "name": "my-test",
+                "classes": [
+                    "my.test"
+                ]
+            }
+        ]
+    }
+]

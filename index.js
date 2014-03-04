@@ -1,19 +1,23 @@
-/***************************************************************************
- * 
- * Copyright (c) 2014 Baidu.com, Inc. All Rights Reserved
- * $Id$ 
- * 
- **************************************************************************/
- 
- 
- 
 /**
  * index.js ~ 2014/03/03 13:16:27
  * @author leeight(liyubei@baidu.com)
- * @version $Revision$ 
- * @description 
+ * @ignore
  * hello index.js
  **/
+
+/**
+ * @class my.test
+ */
+var mytest = {};
+
+/**
+ * 测试一下foo
+ *
+ *     @example
+ *     var a = 10;
+ *     var b = 30;
+ */
+mytest.foo = function(){};
 
 
 
