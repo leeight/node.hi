@@ -1,6 +1,6 @@
 {
   "name": "my-test",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "baidu hi based on node.js",
   "main": "index.js",
   "scripts": {
